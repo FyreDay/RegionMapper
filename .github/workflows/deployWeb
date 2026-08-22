@@ -31,7 +31,7 @@ jobs:
           ln -s /root/.local ~/.local
           ln -s /root/.config/godot ~/.config/godot
 
-       - name: Verify templates
+      - name: Verify templates
         run: |
           echo "HOME=$HOME"
           find / -iname "web_nothreads*" 2>/dev/null

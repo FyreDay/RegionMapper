@@ -175,7 +175,7 @@ from .regions import Regions
 from rule_builder.rules import Has, True_
 
 class EntranceTypeEnum(Enum):
-    def __init__(self, value: str, exiting_region: RegionTypeEnum, entering_region: RegionTypeEnum, entrance_group: Number, rule):
+    def __init__(self, value: str, exiting_region: RegionTypeEnum, entering_region: RegionTypeEnum, entrance_group: Number, rule = True_()):
         # self._value_ must be set to the first element to support lookup by value
         self._value_ = value
         self.exiting_screen = exiting_region
@@ -188,15 +188,27 @@ class EntranceTypeEnum(Enum):
 
 func generate_entrances_python(data):
     var output := ENTRANCES_HEADER
-    output += "class Entrances(EntranceTypeEnum):"
+    output += "class Entrances(EntranceTypeEnum):\n"
     for entrance in data:
         #TODO:attach entrance group
         output += ('    ' + entrance.id + ' = (' + JSON.stringify(entrance.name) + 
         ', Regions.' + entrance.from_region + ', Regions.' + entrance.to_region + 
-        ', ' + '0' + ', ' + entrance.rule + ')\n')
+        ', ' + '0' + get_rule_dict(entrance.rule_name) + ')\n')
         if entrance.dual_directional:
             output += ('    ' + entrance.id + '_BACK = (' + JSON.stringify(entrance.name + ' Backwards') + 
         ', Regions.' + entrance.to_region + ', Regions.' + entrance.from_region + 
-        ', ' + '0' + ', ' + entrance.rule + ')\n')
+        ', ' + '0' +  get_rule_dict(entrance.rule_name) + ')\n')
     return output
+    
+    
+func get_rule_dict(rule_name: String):
+    if rule_name == null or rule_name == "":
+        return ""
+    var combo = ui.get_rule_combo(rule_name)
+    if not combo.root:
+        return ""
+    return (', ' +  JSON.stringify(combo.root.to_dict()))
+   
+    
+    
     

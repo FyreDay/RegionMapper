@@ -124,6 +124,8 @@ func load_rule_data(data:Dictionary):
     rule_manager.load_data(data, drag_layer)
     rule_palette_manager.load_data(data, rule_manager, drag_layer)
 
+func get_rule_combo(name: String) -> RuleCombo:
+    return rule_palette_manager.get_rule_combo(name)
 
 func _on_open_creator_pressed() -> void:
     custom_rule_creator.popup(CustomRule.new(), rule_manager, drag_layer)

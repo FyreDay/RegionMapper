@@ -12,7 +12,11 @@ func set_combo_name(new_name: String) -> void:
     changed.emit()
 
 func to_dict() -> Dictionary:
-    return {"combo_name": combo_name, "root": root.to_dict()}
+    var root_out = ""
+    if root:
+        root_out = root.to_dict()
+
+    return {"combo_name": combo_name, "root": root_out}
 
 
 static func from_dict(data: Dictionary, rule_manager: RuleManager) -> RuleCombo:

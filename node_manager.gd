@@ -329,13 +329,23 @@ func _on_region_drag_ended(region, old_pos, new_pos):
     undo_redo.add_undo_method(region.set_rect_pos.bind(old_pos))
     undo_redo.commit_action()
     
+func manage_pos(region, pos: Vector2):
+    region.set_rect_pos.bind(pos)
+    for child in get_children():
+        if child is Entrance:
+            if child.to_region == region:
+                child.set_endpoint(Entrance.endpoints.TO_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.TO_ENDPOINT) + child.get_offset(Entrance.endpoints.TO_ENDPOINT))
+            if child.from_region == region:
+                child.set_endpoint(Entrance.endpoints.FROM_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.FROM_ENDPOINT) + child.get_offset(Entrance.endpoints.FROM_ENDPOINT))
+    
+
 func _on_region_resize_ended(region, old_size, new_size):
     undo_redo.create_action("Resize Region")
     undo_redo.add_do_method(region.set_rect_size.bind(new_size))
     undo_redo.add_undo_method(region.set_rect_size.bind(old_size))
     undo_redo.commit_action()
     
-func _on_drag_moved(region, old_pos, offset):
+func _on_drag_moved(region, _old_pos, offset):
     for child in get_children():
         if child is Entrance:
             if child.to_region == region:

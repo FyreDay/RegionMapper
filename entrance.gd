@@ -268,12 +268,19 @@ func _on_rule_combo_invalid():
     rule_plate.text = ""
     rule_plate.hide()
     
+func get_endpoint_pos(endpoint):
+    if endpoint == endpoints.FROM_ENDPOINT:
+        return from_pos
+    else:
+        return to_pos
 
 func set_endpoint(endpoint, new_pos):
     if endpoint == endpoints.FROM_ENDPOINT:
         from_pos = new_pos
+        from_endpoint_offset = Vector2.ZERO
     else:
         to_pos = new_pos
+        to_endpoint_offset = Vector2.ZERO
     queue_redraw()
 
 func set_offset(endpoint: endpoints, offset: Vector2):
@@ -283,6 +290,12 @@ func set_offset(endpoint: endpoints, offset: Vector2):
         from_endpoint_offset = offset
     queue_redraw()
     
+func get_offset(endpoint: endpoints):
+    if endpoint == endpoints.TO_ENDPOINT:
+        return to_endpoint_offset
+    elif endpoint == endpoints.FROM_ENDPOINT:
+        return from_endpoint_offset
+
 func _on_edit_menu_popup_hide() -> void:
     name_edit.remove_theme_stylebox_override("normal")
     popup_closed.emit()

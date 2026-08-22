@@ -1,8 +1,6 @@
 class_name CustomRuleCreator
 extends Control
 
-signal new_rule
-
 var arg_type = preload("res://rules/menus/rule_arg_type.tscn")
 var rule_data = preload("res://rules/dragable_custom_rule.tscn")
 

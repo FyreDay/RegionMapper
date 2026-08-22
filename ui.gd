@@ -9,6 +9,8 @@ signal save_data
 signal save_path(path: String)
 signal export_path(dir: String)
 signal rule_builder_toggled(bool)
+signal request_web_import
+signal request_web_map_import  
 
 @onready var file_dialog: FileDialog = $FilePngDialog
 @onready var save_file_load_dialog: FileDialog = $FileLoadDialog
@@ -61,13 +63,21 @@ func _on_file_dialog_file_selected(path: String) -> void:
     map_selected.emit(path)
 
 func _on_button_pressed() -> void:
-    file_dialog.popup_file_dialog()
+    if OS.get_name() == "Web":
+        request_web_map_import.emit() 
+    else:
+        file_dialog.popup_file_dialog()
 
 func _on_save_button_pressed() -> void:
     save_data.emit()
 
+
 func _on_load_button_pressed() -> void:
-    save_file_load_dialog.popup_file_dialog()
+    if OS.get_name() == "Web":
+        request_web_import.emit()
+    else:
+        save_file_load_dialog.popup_file_dialog()
+
 
 func _on_file_load_dialog_file_selected(path: String) -> void:
     load_data.emit(path)
@@ -78,8 +88,10 @@ func _on_save_file_dialog_file_selected(path: String) -> void:
 
 
 func _on_export_button_pressed() -> void:
-    export_dialog.popup_file_dialog()
-
+    if OS.get_name() == "Web":
+        export_path.emit("")   # dir is ignored on web, see main.gd
+    else:
+        export_dialog.popup_file_dialog()
 
 func _on_export_dir_dialog_dir_selected(dir: String) -> void:
     export_path.emit(dir)

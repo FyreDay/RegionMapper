@@ -18,18 +18,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    container:
-      image: barichello/godot-ci:mono-4.6.3
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fontconfig
+
+      - name: Install Godot
+        run: |
+          wget https://github.com/godotengine/godot/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip
+          unzip Godot_v4.6.3-stable_linux.x86_64.zip
+          sudo mv Godot_v4.6.3-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Install Web export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/4.6.3.stable
+          wget https://github.com/godotengine/godot/releases/download/4.6.3-stable/Godot_v4.6.3-stable_export_templates.tpz
+          unzip -o Godot_v4.6.3-stable_export_templates.tpz -d /tmp/godot_templates
+          mv /tmp/godot_templates/templates/* ~/.local/share/godot/export_templates/4.6.3.stable/
+
       - name: Import project
-        run: godot --headless --editor --quit
+        run: |
+          godot --headless --editor --quit
 
       - name: Export Web
-        run: godot --headless --export-release "Web" build/index.html
+        run: |
+          mkdir -p build
+          godot --headless --export-release "Web" build/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

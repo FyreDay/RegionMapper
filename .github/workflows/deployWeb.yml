@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     container:
       image: barichello/godot-ci:4.6.3
@@ -25,11 +25,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Import project
-        run: godot --headless --editor --quit
+      - name: Setup Godot
+        run: |
+          mkdir -p ~/.config
+          ln -s /root/.local ~/.local
+          ln -s /root/.config/godot ~/.config/godot
+
+      - name: Verify templates
+        run: |
+          echo "HOME=$HOME"
+          find / -iname "web_nothreads*" 2>/dev/null
+          find / -iname "web_*.zip" 2>/dev/null
 
       - name: Export Web
-        run: godot --headless --export-release "Web" build/index.html
+        run: |
+          mkdir -p build
+          godot --headless --export-release "Web" build/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -37,12 +48,12 @@ jobs:
           path: build
 
   deploy:
+    runs-on: ubuntu-24.04
+    needs: build
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-    needs: build
 
     steps:
       - name: Deploy to GitHub Pages

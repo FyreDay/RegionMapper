@@ -1,6 +1,8 @@
 class_name LogicUI
 extends Control
 
+signal popup_opened
+signal popup_closed
 signal map_selected(path: String)
 signal load_data
 signal save_data

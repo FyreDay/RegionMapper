@@ -53,7 +53,8 @@ func from_rule_data(new_rule_data:RuleData):
         if is_hovered.is_connected(drag_layer.update_rule_spot):
             is_hovered.disconnect(drag_layer.update_rule_spot)
     else:
-        is_hovered.connect(drag_layer.update_rule_spot)
+        if not is_hovered.is_connected(drag_layer.update_rule_spot):
+            is_hovered.connect(drag_layer.update_rule_spot)
     _update_style()
     
 

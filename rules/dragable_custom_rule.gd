@@ -1,7 +1,15 @@
 class_name DragableCustomRule
 extends LineEdit
 
+signal popup_opened
+signal popup_closed
+signal name_change_request(DragableCustomRule, String)
+signal delete_me
+
 var dragable_ref = preload("res://rules/dragable_rule_data.tscn")
+
+@onready var edit_menu: PopupPanel = $EditMenu
+@onready var name_edit: LineEdit = $EditMenu/VBoxContainer/NameEdit
 
 var mouse_over = false
 var click_count = 0
@@ -51,6 +59,9 @@ func set_rule(new_custom_rule:CustomRule):
         text = custom_rule.rule_name
     else:
         queue_free()
+        
+func dispay_error():
+    print("error")
 
 func _gui_input(event: InputEvent) -> void:
     if event is InputEventMouseButton:
@@ -61,13 +72,29 @@ func _gui_input(event: InputEvent) -> void:
                 print("click")
                 click_count += 1
         if event.button_index == MOUSE_BUTTON_RIGHT:
-            if event.pressed and custom_rule:
-                print(str(custom_rule.to_dict()))
+            if event.pressed and custom_rule and custom_rule.editable:
+                open_edit_menu()
                 
     if event is InputEventMouseMotion:
         if not(dragging and Input.is_action_pressed("click")):
             dragging = false
             drag_timer = 0
+
+
+func open_edit_menu():
+    popup_opened.emit()
+    name_edit.text = custom_rule.rule_name
+    edit_menu.position = get_viewport().get_mouse_position()
+    edit_menu.reset_size()
+    edit_menu.popup()
+
+func _on_name_edit_text_changed(new_text: String) -> void:
+    name_change_request.emit(self, new_text)
+
+func set_rule_name(new_name):
+    custom_rule.set_name(new_name)
+    text = new_name
+    queue_redraw()
 
 func _on_mouse_entered() -> void:
     mouse_over = true
@@ -93,3 +120,13 @@ func _on_text_submitted(new_text: String) -> void:
     selecting_enabled = false
     editable = false
     release_focus()
+
+func _on_edit_menu_popup_hide() -> void:
+    name_edit.remove_theme_stylebox_override("normal")
+    popup_closed.emit()
+
+
+func _on_delete_button_pressed() -> void:
+    custom_rule.invalid.emit()
+    delete_me.emit(self)
+    

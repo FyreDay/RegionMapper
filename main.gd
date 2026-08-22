@@ -16,9 +16,12 @@ func _ready() -> void:
     ui.save_path.connect(_on_save_path)
     ui.load_data.connect(_on_load_data)
     ui.export_path.connect(_on_export_data)
+    ui.popup_opened.connect(map.camera.disable_input)
+    ui.popup_closed.connect(map.camera.enable_input)
     node_manager.popup_opened.connect(map.camera.disable_input)
     node_manager.popup_closed.connect(map.camera.enable_input)
     node_manager.hovered_entrance_update.connect(ui.update_entrance)
+    
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

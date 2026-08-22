@@ -2,6 +2,7 @@ class_name RuleCombo
 extends RefCounted
 
 signal changed
+signal invalid
 
 var combo_name: String
 var root: RuleData

@@ -81,6 +81,7 @@ func _on_string_value_text_changed(new_text: String) -> void:
 func _on_int_value_value_changed(value: float) -> void:
     old_arg_type.default_value = value
     custom_rule.arg_definitions[old_name] = old_arg_type
+    print(str(custom_rule.to_dict()))
 
 
 func _on_bool_value_toggled(toggled_on: bool) -> void:

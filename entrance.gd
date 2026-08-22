@@ -37,9 +37,6 @@ var rule_combo:RuleCombo
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
     z_index = 10
-    print("rule_name = ", rule_name)
-    print("rule_plate = ", rule_plate)
-    print("name_edit = ", name_edit)
     rule_plate.hide()
 
 
@@ -243,24 +240,33 @@ func set_entrance_name(new_name):
     queue_redraw()
 
 func set_rule(new_rule_combo:RuleCombo):
-    rule_combo = new_rule_combo
-    if rule_combo:
-        if rule_combo.changed.is_connected(_on_rule_combo_changed):
+    
+    if new_rule_combo:
+        if rule_combo and rule_combo.invalid.is_connected(_on_rule_combo_invalid):
+            rule_combo.invalid.disconnect(_on_rule_combo_invalid)
+        
+        if rule_combo and rule_combo.changed.is_connected(_on_rule_combo_changed):
             rule_combo.changed.disconnect(_on_rule_combo_changed)
+        rule_combo = new_rule_combo
         rule_name.text = rule_combo.combo_name
         rule_plate.text = rule_combo.combo_name
         rule_plate.show()
+        rule_combo.invalid.connect(_on_rule_combo_invalid)
         rule_combo.changed.connect(_on_rule_combo_changed)  
     else:
-        rule_name.text = ""
-        rule_plate.text = ""
-        rule_plate.hide()
+        _on_rule_combo_invalid()
     queue_redraw()
 
 func _on_rule_combo_changed():
     rule_name.text = rule_combo.combo_name
     rule_plate.text = rule_combo.combo_name
     queue_redraw()
+    
+func _on_rule_combo_invalid():
+    rule_combo = null
+    rule_name.text = ""
+    rule_plate.text = ""
+    rule_plate.hide()
     
 
 func set_endpoint(endpoint, new_pos):

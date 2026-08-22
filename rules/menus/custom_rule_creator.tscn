@@ -14,15 +14,18 @@ script = ExtResource("1_rrcu7")
 [node name="PopupPanel" type="PopupPanel" parent="." unique_id=1732568783]
 title = "Edit Custom Rule"
 initial_position = 1
+size = Vector2i(600, 300)
 
-[node name="PanelContainer" type="PanelContainer" parent="PopupPanel" unique_id=1750567921]
+[node name="PanelContainer" type="ScrollContainer" parent="PopupPanel" unique_id=2061239716]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 161.0
-offset_bottom = 109.0
+offset_right = 596.0
+offset_bottom = 296.0
 
 [node name="VBoxParent" type="VBoxContainer" parent="PopupPanel/PanelContainer" unique_id=1300163359]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="NameBanner" type="HBoxContainer" parent="PopupPanel/PanelContainer/VBoxParent" unique_id=2080044017]
 layout_mode = 2

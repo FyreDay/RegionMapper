@@ -59,3 +59,8 @@ text = "Add"
 
 [connection signal="item_selected" from="ArgType" to="." method="_on_arg_type_item_selected"]
 [connection signal="text_changed" from="ArgName" to="." method="_on_arg_name_text_changed"]
+[connection signal="text_changed" from="StringValue" to="." method="_on_string_value_text_changed"]
+[connection signal="value_changed" from="IntValue" to="." method="_on_int_value_value_changed"]
+[connection signal="value_changed" from="FloatValue" to="." method="_on_float_value_value_changed"]
+[connection signal="toggled" from="BoolValue" to="." method="_on_bool_value_toggled"]
+[connection signal="pressed" from="StringListValue/Add" to="." method="_on_string_list_add_pressed"]

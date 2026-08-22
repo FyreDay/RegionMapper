@@ -2,6 +2,13 @@ class_name DragableRuleNameEdit
 extends LineEdit
 
 signal selected(DragableRuleNameEdit)
+signal popup_opened
+signal popup_closed
+signal name_change_request(DragableCustomRule, String)
+signal delete_me
+
+@onready var edit_menu: PopupPanel = $EditMenu
+@onready var name_edit: LineEdit = $EditMenu/VBoxContainer/NameEdit
 
 var dragable_ref = preload("res://rules/dragable_rule_ref.tscn")
 var mouse_over = false
@@ -23,16 +30,16 @@ func _process(delta: float) -> void:
     #if Input.is_action_just_pressed("Exit") and has_focus():
         #
         
-    if click_count > 0:
-        elapsed_time+=delta
-        if click_count >= 2:
-            elapsed_time = 0
-            click_count = 0
-            selecting_enabled = true
-            editable = true
-        if elapsed_time > .3:
-            click_count-=1
-            elapsed_time = 0
+    #if click_count > 0:
+        #elapsed_time+=delta
+        #if click_count >= 2:
+            #elapsed_time = 0
+            #click_count = 0
+            #selecting_enabled = true
+            #editable = true
+        #if elapsed_time > .3:
+            #click_count-=1
+            #elapsed_time = 0
     if dragging:
         drag_timer += delta
         if drag_timer >= dragtime:
@@ -58,11 +65,12 @@ func _gui_input(event: InputEvent) -> void:
                 if rule_mode:
                     selected.emit(self)
                 dragging = true
-            elif mouse_over:
-                click_count += 1
+            #elif mouse_over:
+                #click_count += 1
         if event.button_index == MOUSE_BUTTON_RIGHT:
-            if event.pressed and rule_combo.root:
-                print(str(rule_combo.root.to_dict()))
+            print("right")
+            if event.pressed:
+                open_edit_menu()
                 
                 
     if event is InputEventMouseMotion:
@@ -71,6 +79,24 @@ func _gui_input(event: InputEvent) -> void:
             drag_timer = 0
             
         
+func open_edit_menu():
+    print("open edit menu")
+    popup_opened.emit()
+    name_edit.text = rule_combo.combo_name
+    edit_menu.position = get_viewport().get_mouse_position()
+    edit_menu.reset_size()
+    edit_menu.popup()
+
+func dispay_error():
+    print("error")
+
+func _on_name_edit_text_changed(new_text: String) -> void:
+    name_change_request.emit(self, new_text)
+
+func set_combo_name(new_name):
+    rule_combo.set_combo_name(new_name)
+    text = new_name
+    queue_redraw()
 
 func _on_mouse_entered() -> void:
     mouse_over = true
@@ -105,4 +131,11 @@ func update_rule_data(new_rule_data:RuleData):
     
 func on_rule_builder_state(open:bool):
     rule_mode = open
-    
+
+func _on_edit_menu_popup_hide() -> void:
+    name_edit.remove_theme_stylebox_override("normal")
+    popup_closed.emit()
+
+func _on_delete_button_pressed() -> void:
+    rule_combo.invalid.emit()
+    delete_me.emit(self)

@@ -15,13 +15,11 @@ var rule_manager: RuleManager
 var drag_layer:DragLayer
 
 func _on_button_pressed() -> void:
-    print("CREATOR BEFORE: ", custom_rule.get_instance_id())
     var new_arg_type = arg_type.instantiate()
     arg_container.add_child(new_arg_type)
     new_arg_type.setup(custom_rule)
     queue_redraw()
-    print(str(custom_rule.to_dict()))
-    print("CREATOR AFTER: ", custom_rule.get_instance_id())
+    
 
 
 func _on_delete_arg_pressed() -> void:
@@ -33,8 +31,9 @@ func _on_delete_arg_pressed() -> void:
 
 func _on_save_pressed() -> void:
     var dcr = rule_data.instantiate()
-    rule_manager.add_child(dcr)
+    rule_manager.add_custom_dragable(dcr)
     dcr.setup(custom_rule, drag_layer)
+    print(str(custom_rule.to_dict()))
 
 func _on_rule_name_text_changed(new_text: String) -> void:
     custom_rule.rule_name = new_text

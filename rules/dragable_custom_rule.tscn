@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" uid="uid://2f23pl8k8l1v" path="res://rules/dragable_custom_rule.gd" id="1_71xj2"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_71xj2"]
+bg_color = Color(0.62675035, 0, 0.14012492, 1)
+
 [node name="DragableCustomRule" type="LineEdit" unique_id=448951901]
 anchors_preset = 15
 anchor_right = 1.0
@@ -15,7 +18,31 @@ emoji_menu_enabled = false
 selecting_enabled = false
 script = ExtResource("1_71xj2")
 
+[node name="EditMenu" type="PopupPanel" parent="." unique_id=1087429670]
+size = Vector2i(100, 114)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="EditMenu" unique_id=936696143]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 96.0
+offset_bottom = 110.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NameEdit" type="LineEdit" parent="EditMenu/VBoxContainer" unique_id=1937407041]
+layout_mode = 2
+expand_to_text_length = true
+emoji_menu_enabled = false
+
+[node name="DeleteButton" type="Button" parent="EditMenu/VBoxContainer" unique_id=553128626]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_71xj2")
+text = "Delete"
+
 [connection signal="focus_exited" from="." to="." method="_on_focus_exited"]
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]
 [connection signal="text_submitted" from="." to="." method="_on_text_submitted"]
+[connection signal="popup_hide" from="EditMenu" to="." method="_on_edit_menu_popup_hide"]
+[connection signal="text_changed" from="EditMenu/VBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
+[connection signal="pressed" from="EditMenu/VBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]

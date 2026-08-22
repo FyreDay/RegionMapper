@@ -1,6 +1,7 @@
 class_name DragableRuleData
 extends VBoxContainer
 
+
 @onready var name_ref: LineEdit = $Rule/NameRef
 @onready var rule_children: VBoxContainer = $MarginContainer/RuleChildren
 @onready var rule_args: HBoxContainer = $Rule/Args
@@ -60,6 +61,7 @@ func setup(custom_rule:CustomRule, is_dragging):
     drag_layer = get_parent() as DragLayer
     rule_data = RuleData.new()
     rule_data.rule = custom_rule
+    custom_rule.invalid.connect(_on_invalid_custom_rule)
     dragging = is_dragging
     name_ref.text = custom_rule.rule_name
     for key in custom_rule.arg_definitions:
@@ -67,6 +69,10 @@ func setup(custom_rule:CustomRule, is_dragging):
     create_args()
     if not rule_data.rule.is_combinator:
         buttons.hide()    
+
+func _on_invalid_custom_rule():
+    get_parent().release_dragable_rule()
+    queue_free()
 
 func create_args():
     for key in rule_data.rule.arg_definitions:

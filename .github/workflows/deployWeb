@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y fontconfig
+          sudo apt-get install -y fontconfig unzip wget
 
       - name: Install Godot
         run: |
@@ -34,12 +34,26 @@ jobs:
           sudo mv Godot_v4.6.3-stable_linux.x86_64 /usr/local/bin/godot
           sudo chmod +x /usr/local/bin/godot
 
-      - name: Install Web export templates
+      - name: Install Godot export templates
         run: |
-          mkdir -p ~/.local/share/godot/export_templates/4.6.3.stable
-          wget https://github.com/godotengine/godot/releases/download/4.6.3-stable/Godot_v4.6.3-stable_export_templates.tpz
-          unzip -o Godot_v4.6.3-stable_export_templates.tpz -d /tmp/godot_templates
-          mv /tmp/godot_templates/templates/* ~/.local/share/godot/export_templates/4.6.3.stable/
+          mkdir -p /tmp/godot-templates
+
+          wget https://github.com/godotengine/godot/releases/download/4.6.3-stable/Godot_v4.6.3-stable_export_templates.tpz \
+            -O /tmp/godot-templates/templates.tpz
+
+          unzip -q /tmp/godot-templates/templates.tpz \
+            -d /tmp/godot-templates/extracted
+
+          mkdir -p /github/home/.local/share/godot/export_templates/4.6.3.stable
+
+          find /tmp/godot-templates/extracted -type f -name "*.zip" -exec cp {} /github/home/.local/share/godot/export_templates/4.6.3.stable/ \;
+
+          echo "Installed templates:"
+          ls -lah /github/home/.local/share/godot/export_templates/4.6.3.stable/
+
+      - name: Verify Godot
+        run: |
+          godot --version
 
       - name: Import project
         run: |

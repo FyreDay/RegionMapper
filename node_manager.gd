@@ -189,7 +189,7 @@ func connect_region_signals(region):
     region.color_change_request.connect(_on_region_color_change_requested)
     region.drag_ended.connect(_on_region_drag_ended)
     region.resize_ended.connect(_on_region_resize_ended)
-    #region.drag_moved.connect(_on_drag_moved)
+    region.drag_moved.connect(_on_drag_moved)
     #region.resize_moved.connect(_on_resize_moved)
 
 func draw_entrance(_delta):
@@ -335,15 +335,15 @@ func _on_region_resize_ended(region, old_size, new_size):
     undo_redo.add_undo_method(region.set_rect_size.bind(old_size))
     undo_redo.commit_action()
     
-#func _on_drag_moved(region, old_pos, offset):
-    #for child in get_children():
-        #if child is Entrance:
-            #if child.to_region == region:
-                #if old_pos.has_point(to_local(child.to_pos)):
-                    #child.set_offset(Entrance.endpoints.TO_ENDPOINT, offset)
-            #if child.from_region == region:
-                #if old_pos.has_point(to_local(child.from_pos)):
-                    #child.set_offset(Entrance.endpoints.FROM_ENDPOINT, offset)
+func _on_drag_moved(region, old_pos, offset):
+    for child in get_children():
+        if child is Entrance:
+            if child.to_region == region:
+                if old_pos.has_point(to_local(child.to_pos)):
+                    child.set_offset(Entrance.endpoints.TO_ENDPOINT, offset)
+            if child.from_region == region:
+                if old_pos.has_point(to_local(child.from_pos)):
+                    child.set_offset(Entrance.endpoints.FROM_ENDPOINT, offset)
             
 func _on_delete_entrance(entrance):
     

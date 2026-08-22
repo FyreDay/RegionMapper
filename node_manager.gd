@@ -325,8 +325,8 @@ func _on_region_color_change_requested(region, new_color, old_color):
     
 func _on_region_drag_ended(region, old_pos, new_pos):
     undo_redo.create_action("Drag Region")
-    undo_redo.add_do_method(region.set_rect_pos.bind(new_pos))
-    undo_redo.add_undo_method(region.set_rect_pos.bind(old_pos))
+    undo_redo.add_do_method(manage_pos.bind(region, new_pos))
+    undo_redo.add_undo_method(manage_pos.bind(region, old_pos))
     undo_redo.commit_action()
     
 func manage_pos(region, pos: Vector2):

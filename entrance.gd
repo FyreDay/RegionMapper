@@ -136,6 +136,7 @@ func open_edit_menu():
 
 
 func _draw() -> void:
+    
     draw_arrow(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset)
     draw_nameplate(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset)
     update_rule_plate()

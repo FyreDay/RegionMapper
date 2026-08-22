@@ -27,18 +27,15 @@ jobs:
 
       - name: Setup Godot
         run: |
-          mkdir -p ~/.local/share/godot/export_templates/
-          mkdir -p ~/.config/
+          mkdir -p ~/.config
+          ln -s /root/.local ~/.local
+          ln -s /root/.config/godot ~/.config/godot
 
-          mv /root/.config/godot ~/.config/godot
-          mv /root/.local/share/godot/export_templates/4.6.3.stable \
-             ~/.local/share/godot/export_templates/4.6.3.stable
-
-      - name: Verify templates
+       - name: Verify templates
         run: |
           echo "HOME=$HOME"
-          echo "Templates:"
-          ls -lah ~/.local/share/godot/export_templates/4.6.3.stable/
+          find / -iname "web_nothreads*" 2>/dev/null
+          find / -iname "web_*.zip" 2>/dev/null
 
       - name: Export Web
         run: |

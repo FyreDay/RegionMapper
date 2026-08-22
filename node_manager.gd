@@ -339,11 +339,9 @@ func _on_drag_moved(region, old_pos, offset):
     for child in get_children():
         if child is Entrance:
             if child.to_region == region:
-                if old_pos.has_point(to_local(child.to_pos)):
-                    child.set_offset(Entrance.endpoints.TO_ENDPOINT, offset)
+                child.set_offset(Entrance.endpoints.TO_ENDPOINT, offset)
             if child.from_region == region:
-                if old_pos.has_point(to_local(child.from_pos)):
-                    child.set_offset(Entrance.endpoints.FROM_ENDPOINT, offset)
+                child.set_offset(Entrance.endpoints.FROM_ENDPOINT, offset)
             
 func _on_delete_entrance(entrance):
     

@@ -282,6 +282,7 @@ func set_offset(endpoint: endpoints, offset: Vector2):
     elif endpoint == endpoints.FROM_ENDPOINT:
         from_endpoint_offset = offset
     queue_redraw()
+    
 func _on_edit_menu_popup_hide() -> void:
     name_edit.remove_theme_stylebox_override("normal")
     popup_closed.emit()

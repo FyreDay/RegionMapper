@@ -15,7 +15,7 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     pass
 
-func set_map(new_image, new_name, new_scale):
+func set_map(new_image, new_name, new_scale = 10):
     image = new_image
     image_name = new_name
     var texture := ImageTexture.create_from_image(new_image)

@@ -375,4 +375,4 @@ func _on_web_png_uploaded(args: Array) -> void:
         push_error("Failed to decode uploaded PNG")
         return
 
-    map.set_map(image, file_name)
+    map.set_map(image, file_name, 10)

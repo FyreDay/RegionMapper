@@ -19,6 +19,7 @@ text = "Name"
 
 [node name="ArgName" type="LineEdit" parent="." unique_id=224746862]
 layout_mode = 2
+expand_to_text_length = true
 
 [node name="Label2" type="Label" parent="." unique_id=295698084]
 layout_mode = 2

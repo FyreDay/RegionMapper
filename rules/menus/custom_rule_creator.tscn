@@ -37,6 +37,7 @@ text = "Rule Name"
 [node name="RuleName" type="LineEdit" parent="PopupPanel/PanelContainer/VBoxParent/NameBanner" unique_id=1494744777]
 layout_mode = 2
 alignment = 1
+expand_to_text_length = true
 
 [node name="SaveBanner" type="HBoxContainer" parent="PopupPanel/PanelContainer/VBoxParent" unique_id=1649009965]
 layout_mode = 2

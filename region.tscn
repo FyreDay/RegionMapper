@@ -23,6 +23,7 @@ text = "Copy Name"
 
 [node name="NameEdit" type="LineEdit" parent="EditMenu/VBoxContainer" unique_id=1611688953]
 layout_mode = 2
+expand_to_text_length = true
 
 [node name="ColorChanger" type="ColorPickerButton" parent="EditMenu/VBoxContainer" unique_id=518299246]
 layout_mode = 2

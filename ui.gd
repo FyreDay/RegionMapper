@@ -12,6 +12,8 @@ signal rule_builder_toggled(bool)
 signal request_web_import
 signal request_web_map_import  
 
+signal region_scale_changed(float)
+
 @onready var file_dialog: FileDialog = $FilePngDialog
 @onready var save_file_load_dialog: FileDialog = $FileLoadDialog
 @onready var save_file_dialog: FileDialog = $SaveFileDialog
@@ -31,6 +33,9 @@ signal request_web_map_import
 @onready var rule_palette_manager: RulePaletteManager = $CanvasLayer/PalettePanel/ScrollContainer/RulePaletteManager
 
 @onready var custom_rule_creator: CustomRuleCreator = $CustomRuleCreator
+
+@onready var hint_panel: PopupPanel = $ControlHintPanel
+@onready var scale_spinner: SpinBox = $CanvasLayer/Panel/HBoxContainer/ScaleSpinBox
 
 var dragable = preload("res://rules/Dragable_Rule.tscn")
 
@@ -141,3 +146,13 @@ func get_rule_combo(new_name: String) -> RuleCombo:
 
 func _on_open_creator_pressed() -> void:
     custom_rule_creator.popup(CustomRule.new(), rule_manager, drag_layer)
+
+
+func _on_spin_box_value_changed(value: float) -> void:
+    region_scale_changed.emit(value)
+
+func set_scale_spinner(value: float):
+    scale_spinner.value = value
+
+func _on_control_hint_pressed() -> void:
+    hint_panel.popup()

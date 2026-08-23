@@ -17,6 +17,7 @@ layout_mode = 2
 layout_mode = 2
 expand_to_text_length = true
 emoji_menu_enabled = false
+drag_and_drop_selection_enabled = false
 
 [node name="IntValue" type="SpinBox" parent="." unique_id=1897634937]
 layout_mode = 2

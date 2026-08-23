@@ -14,7 +14,11 @@ var pending_image_name: String
 var _web_zip_upload_callback
 var _web_png_upload_callback
 
+var undo_redo := UndoRedo.new()
+
 func _ready() -> void:
+    ui.region_scale_changed.connect(map._on_region_scale)
+    node_manager.setup(undo_redo)
     ui.map_selected.connect(map.set_map_path)
     ui.save_data.connect(_on_save_data)
     ui.save_path.connect(_on_save_path)
@@ -32,6 +36,15 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
     pass
 
+func _input(event: InputEvent) -> void:
+    if event.is_action_pressed("redo"):
+        undo_redo.redo()
+        get_viewport().set_input_as_handled()
+        return
+    if event.is_action_pressed("undo"):
+        undo_redo.undo()
+        get_viewport().set_input_as_handled()
+    
 # ---------------------------------------------------------------------------
 # Loading a project zip (shared by desktop FileDialog and web upload)
 # ---------------------------------------------------------------------------
@@ -98,7 +111,8 @@ func _on_load_data(path):
         zip.close()
         return
     if meta.image_name != "":
-        map.set_map(image, meta.image_name)
+        map.set_map(image, meta.image_name, meta.get("map_scale", 10))
+        ui.set_scale_spinner(meta.get("map_scale", 10))
     ui.load_rule_data(data.get("rules"))
     node_manager.load_data(data.get("nodes"), ui.rule_palette_manager)
 
@@ -114,7 +128,8 @@ func _on_save_data():
     pending_image = map.image
     pending_meta_json = JSON.stringify({
         "version": "0.0.1",
-        "image_name": map.image_name
+        "image_name": map.image_name,
+        "map_scale": map.map_scale
     })
     pending_image_name = map.image_name
 

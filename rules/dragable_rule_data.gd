@@ -11,10 +11,6 @@ var rule_arg = preload("res://rules/rule_arg.tscn")
 var rule_spot = preload("res://rules/rule_spot.tscn")
 var drag_layer:DragLayer
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-    pass # Replace with function body.
-
 var dragging:bool
 var click_held:bool
 const dragtime = .3
@@ -30,6 +26,9 @@ func _process(delta: float) -> void:
             dragging = true
             if get_parent() is RuleSpot:
                 get_parent().release_dragable_rule()
+            for child in rule_children.get_children():
+                if child is RuleSpot:
+                    child.being_dragged = true
             click_held = false
             
     if not dragging:
@@ -44,6 +43,12 @@ func _process(delta: float) -> void:
             return
         drag_layer.hovered_rule_spot.set_rule(self)
         dragging = false
+        for child in rule_children.get_children():
+            if child is RuleSpot:
+                child.being_dragged = false
+        if rule_data.rule.is_combinator:
+            _on_add_pressed()
+            _on_add_pressed()
     
     
     #test

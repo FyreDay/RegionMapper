@@ -10,6 +10,7 @@ var hovered := false
 var dragable_rule_data:DragableRuleData
 #this is for when you can remove a rule from this spot
 var parent_rule_data:RuleData
+var being_dragged:= false
 
 func _ready() -> void:
     if drag_layer:
@@ -17,6 +18,9 @@ func _ready() -> void:
     _update_style()
 
 func _on_mouse_entered() -> void:
+    print("Entered" + str(self))
+    if being_dragged:
+        return
     hovered = true
     _update_style()
     is_hovered.emit(self)
@@ -29,10 +33,10 @@ func setup(new_drag_layer:Control, new_parent_rule_data):
         
 
 func _on_mouse_exited() -> void:
-    print("mouse enteted")
+    print("Exited" + str(self))
     hovered = false
     _update_style()
-    is_hovered.emit(self)
+    is_hovered.emit(null)
 
 func has_rule():
     return dragable_rule_data != null

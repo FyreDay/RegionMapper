@@ -64,7 +64,7 @@ func is_mouse_over(global_mouse_pos: Vector2) -> bool:
     #endpoint detection maybe
     return false
     
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
     var mouse_pos := get_global_mouse_position()
    
     if event is InputEventMouseButton:
@@ -258,6 +258,7 @@ func set_rule(new_rule_combo:RuleCombo):
         _on_rule_combo_invalid()
     queue_redraw()
 
+
 func _on_rule_combo_changed():
     rule_name.text = rule_combo.combo_name
     rule_plate.text = rule_combo.combo_name
@@ -314,3 +315,8 @@ func _on_hovered_region(_region, merge_controller):
 
 func _on_delete_rule_pressed() -> void:
     set_rule(null)
+
+
+func _on_is_two_way_toggled(toggled_on: bool) -> void:
+    duel_directonal = toggled_on
+    queue_redraw()

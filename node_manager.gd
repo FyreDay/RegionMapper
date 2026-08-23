@@ -18,11 +18,13 @@ var hovered_region = null
 var entrance_from_region = null
 var index = 0
 
-var undo_redo := UndoRedo.new()
+var undo_redo: UndoRedo
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
     pass # Replace with function body.
 
+func setup(new_undo_redo: UndoRedo):
+    undo_redo = new_undo_redo
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -52,9 +54,9 @@ func get_hovered_object():
         hovered_region_update.emit(null, null)
     return result
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
     if event.is_action_pressed("open_object_menu"):
-        if Input.is_key_pressed(KEY_SHIFT):
+        if Input.is_key_pressed(KEY_CTRL):
             return
         var object = get_hovered_object()
         if object:
@@ -68,14 +70,6 @@ func _input(event: InputEvent) -> void:
                 undo_redo.add_undo_method(undo_region_merge.bind(object.snapshot_regions(), mergingRegion.snapshot_regions()))
                 undo_redo.commit_action()
             isMerging = false
-    if event.is_action_pressed("redo"):
-        undo_redo.redo()
-        return
-    if event.is_action_pressed("undo"):
-        undo_redo.undo()
-   
-    
-    
 
 func _draw() -> void:
     if isDrawingRegion:
@@ -144,7 +138,7 @@ func draw_region(_delta):
         return
         
     if !isDrawingRegion and Input.is_action_just_pressed("draw_region"):
-        if not Input.is_key_pressed(KEY_SHIFT):
+        if not Input.is_key_pressed(KEY_CTRL):
             return
         dragStartMousePos = get_global_mouse_position()
         isDrawingRegion = true
@@ -152,10 +146,10 @@ func draw_region(_delta):
         
     if isDrawingRegion and Input.is_action_just_released("draw_region"):
         isDrawingRegion = false
-        if abs(dragSizeVector.x) < 20:
-            dragSizeVector.x = 20 * sign(dragSizeVector.x)
-        if abs(dragSizeVector.y) < 20:
-            dragSizeVector.y = 20 * sign(dragSizeVector.y)
+        if abs(dragSizeVector.x) < 80:
+            dragSizeVector.x = 80 * sign(dragSizeVector.x)
+        if abs(dragSizeVector.y) < 80:
+            dragSizeVector.y = 80 * sign(dragSizeVector.y)
             
         create_region(Rect2(dragStartMousePos, dragSizeVector))
         queue_redraw()
@@ -196,7 +190,7 @@ func draw_entrance(_delta):
     if isDrawingRegion:
         return
     if !isDrawingEntrance and Input.is_action_just_pressed("draw_entrance"):
-        if not Input.is_key_pressed(KEY_SHIFT) or hovered_region == null:
+        if not Input.is_key_pressed(KEY_CTRL) or hovered_region == null:
             return
         dragStartMousePos = get_global_mouse_position()
         entrance_from_region = hovered_region
@@ -208,7 +202,7 @@ func draw_entrance(_delta):
         if hovered_region == null or hovered_region == entrance_from_region:
             queue_redraw()
             return
-        var duel_directonal = Input.is_key_pressed(KEY_CTRL)
+        var duel_directonal = Input.is_key_pressed(KEY_ALT)
         var start := dragStartMousePos
         var end := dragStartMousePos + dragSizeVector
         create_entrance(entrance_from_region, hovered_region, start, end, duel_directonal)
@@ -393,6 +387,7 @@ func _on_entrance_name_change_requested(entrance, new_name):
 
     undo_redo.commit_action()
     
+    
 func string_to_id(text: String) -> String:
     # Replace spaces and hyphens with underscores
     var sanitized = text.strip_edges().replace(" ", "_").replace("-", "_").replace("'", "")
@@ -560,3 +555,4 @@ func remove_select_children(regions, entrances):
         delete_region_and_reference(region)
     for entrance in entrances:
         remove_child(entrance)
+        

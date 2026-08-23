@@ -146,6 +146,35 @@ file_mode = 2
 access = 2
 use_native_dialog = true
 
+[node name="ControlHintPanel" type="PopupPanel" parent="." unique_id=1452206126]
+initial_position = 1
+
+[node name="Label" type="Label" parent="ControlHintPanel" unique_id=449243809]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 648.0
+offset_bottom = 495.0
+text = "ctrl+left click: Drag a new Region
+ctrl+right click: Drag new Entrance
+ctrl+alt+right click: Drag new two way Entrance
+
+ctrl-z: Undo (unfinished)
+ctrl+shift-z: Redo  (unfinished)
+
+middle mouse/WASD: Pan camera
+scroll wheel: Zoom
+
+right click on objects to bring up context menu
+left click on objects to move
+
+Dragable objects:
+-Region name plates
+-Region resize grips
+-Entrance End points
+-Rules from palette (drag onto Entrance Name Plates)
+
+Load will add all loaded data into your current session. THIS MAY CAUSE CONFLICTS"
+
 [node name="CustomRuleCreator" parent="." unique_id=489813692 instance=ExtResource("2_n5rqp")]
 layout_mode = 1
 
@@ -155,12 +184,14 @@ layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
 anchor_bottom = 0.065
-grow_horizontal = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/Panel" unique_id=1320483242]
-layout_mode = 0
-offset_right = 414.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="SlideToggle" type="TextureButton" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1164816155]
 layout_mode = 2
@@ -184,6 +215,26 @@ text = "Load Data"
 [node name="ExportButton" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=817138769]
 layout_mode = 2
 text = "Export To Python"
+
+[node name="Control" type="Control" parent="CanvasLayer/Panel/HBoxContainer" unique_id=483733643]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1093568883]
+layout_mode = 2
+text = "Map Scale"
+
+[node name="ScaleSpinBox" type="SpinBox" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1001383467]
+layout_mode = 2
+min_value = 4.0
+max_value = 40.0
+step = 0.5
+value = 10.0
+
+[node name="ControlHint" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1691334101]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+text = "?"
 
 [node name="PalettePanel" type="Panel" parent="CanvasLayer" unique_id=921427904]
 anchors_preset = -1
@@ -384,6 +435,8 @@ title = "Are You Sure?"
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/ExportButton" to="." method="_on_export_button_pressed"]
+[connection signal="value_changed" from="CanvasLayer/Panel/HBoxContainer/ScaleSpinBox" to="." method="_on_spin_box_value_changed"]
+[connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/ControlHint" to="." method="_on_control_hint_pressed"]
 [connection signal="toggled" from="CanvasLayer/PalettePanel/Title/RuleBuilderToggle" to="." method="_on_rule_builder_toggled"]
 [connection signal="pressed" from="CanvasLayer/PalettePanel/ScrollContainer/RulePaletteManager/New" to="CanvasLayer/PalettePanel/ScrollContainer/RulePaletteManager" method="_on_new_pressed"]
 [connection signal="pressed" from="CanvasLayer/RuleEditor/RulePartPanel/Title/OpenCreator" to="." method="_on_open_creator_pressed"]

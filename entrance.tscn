@@ -59,5 +59,6 @@ selecting_enabled = false
 
 [connection signal="popup_hide" from="EditMenu" to="." method="_on_edit_menu_popup_hide"]
 [connection signal="text_changed" from="EditMenu/VBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
+[connection signal="toggled" from="EditMenu/VBoxContainer/IsTwoWay" to="." method="_on_is_two_way_toggled"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/RuleContainer/DeleteRule" to="." method="_on_delete_rule_pressed"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]

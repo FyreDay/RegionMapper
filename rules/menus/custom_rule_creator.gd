@@ -17,8 +17,6 @@ func _on_button_pressed() -> void:
     arg_container.add_child(new_arg_type)
     new_arg_type.setup(custom_rule)
     queue_redraw()
-    
-
 
 func _on_delete_arg_pressed() -> void:
     if arg_container.get_child_count() > 0:

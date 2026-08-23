@@ -23,9 +23,6 @@ var rule_combo:RuleCombo
 var drag_layer:Control
 var rule_mode := false
 
-func _ready() -> void:
-    pass
-
 func _process(delta: float) -> void:
     #if Input.is_action_just_pressed("Exit") and has_focus():
         #

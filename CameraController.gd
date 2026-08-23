@@ -5,6 +5,8 @@ var dragStartMousePos = Vector2.ZERO
 var dragStartCameraPos = Vector2.ZERO
 var isDragging = false
 var input_enabled = true
+var map_scale = 1
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
     zoomTarget = zoom
@@ -43,7 +45,7 @@ func SimplePan(delta):
         moveAmount.y += 1
     
     moveAmount = moveAmount.normalized()
-    position += moveAmount * delta * 1000 * zoomMult
+    position += moveAmount * delta * 1000 * zoomMult * (1.0/map_scale)
     
 func ClickAndDrag():
     if not input_enabled:
@@ -58,7 +60,7 @@ func ClickAndDrag():
         
     if isDragging:
         var moveVector = get_viewport().get_mouse_position() - dragStartMousePos
-        position = dragStartCameraPos - moveVector * 1/zoom.x
+        position = dragStartCameraPos - moveVector * 1/(zoom.x * map_scale)
         
 func disable_input() -> void:
     input_enabled = false
@@ -66,3 +68,6 @@ func disable_input() -> void:
 
 func enable_input() -> void:
     input_enabled = true
+
+func set_map_scale(new_scale:float):
+    map_scale = new_scale/10

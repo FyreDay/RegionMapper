@@ -33,9 +33,7 @@ var drag_old_pos: Vector2
 var merge_controller
 var region_references
 var is_merge_controller
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-    pass # Replace with function body.
+
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -44,6 +42,11 @@ func _process(_delta: float) -> void:
 
 func setup(rect: Rect2, new_name):
     node_rect = rect.abs()
+    if node_rect.size.x < 40:
+        node_rect.size.x = 40
+    if node_rect.size.y < 40:
+        node_rect.size.y = 40
+        
     region_name = new_name
     region_color = Color.from_hsv(randf(), 1.0, 1.0,alpha)
     show_behind_parent = true
@@ -84,7 +87,7 @@ func _draw() -> void:
             false
         )
 
-func _input(event: InputEvent) -> void:
+func _unhandled_input(event: InputEvent) -> void:
     var mouse_pos := get_global_mouse_position()
    
     if event is InputEventMouseButton:
@@ -140,8 +143,8 @@ func _input(event: InputEvent) -> void:
             elif current_dragable == Dragables.RESIZE_HANDLE:
                 var old_pos = node_rect
                 var new_size = drag_old_pos + mouse_pos - drag_start_pos
-                new_size.x = 20 if new_size.x <= 20 else new_size.x
-                new_size.y = 20 if new_size.y <= 20 else new_size.y
+                new_size.x = 40 if new_size.x <= 40 else new_size.x
+                new_size.y = 40 if new_size.y <= 40 else new_size.y
                 node_rect.size = new_size
                 resize_moved.emit(self, old_pos, node_rect)
             queue_redraw()
@@ -308,3 +311,4 @@ func _on_color_changer_picker_created() -> void:
 
 func _on_copy_name_button_pressed() -> void:
     DisplayServer.clipboard_set(region_name)
+    

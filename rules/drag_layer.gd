@@ -21,6 +21,10 @@ func update_entrance(entrance:Entrance):
     hovered_entrance = entrance
 
 func update_rule_spot(rule_spot:RuleSpot):
+    if rule_spot != null:
+        print("Hovered new")
+    else:
+        print("Hovered NULL")
     hovered_rule_spot = rule_spot
 
 

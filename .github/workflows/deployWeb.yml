@@ -37,19 +37,20 @@ jobs:
           find / -iname "web_nothreads*" 2>/dev/null
           find / -iname "web_*.zip" 2>/dev/null
 
-      - name: Cache bust Godot assets
-        run: |
-          VERSION=${{ github.sha }}
-
-          sed -i "s|\.wasm|.wasm?v=$VERSION|g" build/index.html
-          sed -i "s|\.pck|.pck?v=$VERSION|g" build/index.html
-          sed -i "s|\.js|.js?v=$VERSION|g" build/index.html
-          
       - name: Export Web
         run: |
           mkdir -p build
           godot --headless --export-release "Web" build/index.html
 
+      - name: Cache bust Godot assets
+        run: |
+          VERSION=${{ github.sha }}
+
+          sed -i \
+            -e "s|\.wasm|.wasm?v=$VERSION|g" \
+            -e "s|\.pck|.pck?v=$VERSION|g" \
+            -e "s|\.js|.js?v=$VERSION|g" \
+            build/index.html
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

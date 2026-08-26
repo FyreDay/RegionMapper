@@ -1,0 +1,21 @@
+Long name support in popup/regions
+
+++removing rule part spot for and/or failing
+
+++ctrl z works for my system AND in text boxes at same time
+
+++infinite or recursion when removing or
+
+check ALLL  name field for expansion
+
+text holding foxus messes with web build
+
+load over not intuitive
+
+wierd focus problems with selecting other cule combos
+
+++UI scale set by user
+
+++dragging take prio over ui
+
+export to csv

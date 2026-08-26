@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://1ggvib64afsm"]
+
+[ext_resource type="Script" uid="uid://bj83at5bepnd7" path="res://flag_box.gd" id="1_nsm0k"]
+
+[node name="FlagBox" type="HBoxContainer" unique_id=1329586182]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_nsm0k")
+
+[node name="CheckBox" type="CheckBox" parent="." unique_id=151254450]
+layout_mode = 2
+
+[connection signal="toggled" from="CheckBox" to="." method="_on_check_box_toggled"]

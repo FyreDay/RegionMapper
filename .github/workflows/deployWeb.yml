@@ -42,6 +42,15 @@ jobs:
           mkdir -p build
           godot --headless --export-release "Web" build/index.html
 
+      - name: Cache bust Godot assets
+        run: |
+          VERSION=${{ github.sha }}
+
+          sed -i \
+            -e "s|\.wasm|.wasm?v=$VERSION|g" \
+            -e "s|\.pck|.pck?v=$VERSION|g" \
+            -e "s|\.js|.js?v=$VERSION|g" \
+            build/index.html
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

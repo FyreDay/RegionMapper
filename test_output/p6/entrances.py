@@ -1,0 +1,15 @@
+from enum import Enum, IntFlag
+from .regions import Regions
+from rule_builder.rules import True_
+from BaseClasses import EntranceType
+
+class EntranceGroups(IntFlag):
+    NONE = 0
+    1 = 1 << 0
+    3 = 1 << 1
+    2 = 1 << 2
+    4 = 1 << 3
+    5 = 1 << 4
+
+class Entrances(EntranceTypeEnum):
+    REGION_TO_REGION_1 = ("Region To Region 1", Regions.REGION, Regions.REGION_1, EntranceType.ONE_WAY, EntranceGroups(11), )

@@ -47,5 +47,7 @@ func popup(editable_custom_rule, manager: RuleManager, dl:DragLayer):
 
 
 func _on_rule_name_gui_input(event: InputEvent) -> void:
-     if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
-        get_viewport().set_input_as_handled()
+     if event is InputEventKey and event.pressed:
+        if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+            # This stops Godot's GUI engine from triggering the popup close
+            accept_event()

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dul0iyid6mrdt"]
 
 [ext_resource type="Script" uid="uid://dhq3kxbfkgart" path="res://ui.gd" id="1_fyqef"]
+[ext_resource type="Script" uid="uid://c0oinkf3vhxwu" path="res://entrance_group_popup_panel.gd" id="2_cxd00"]
 [ext_resource type="PackedScene" uid="uid://cie5aqajygw2w" path="res://entrance_group_editor.tscn" id="2_gs482"]
 [ext_resource type="Texture2D" uid="uid://bboquyyjxa6yl" path="res://assets/burger.png" id="2_m6e0p"]
 [ext_resource type="PackedScene" uid="uid://mitf4vuurruh" path="res://rules/menus/custom_rule_creator.tscn" id="2_n5rqp"]
@@ -180,6 +181,7 @@ Load will add all loaded data into your current session. THIS MAY CAUSE CONFLICT
 initial_position = 1
 size = Vector2i(600, 600)
 unresizable = false
+script = ExtResource("2_cxd00")
 
 [node name="EntranceGroupEditor" parent="EntranceGroupPopupPanel" unique_id=1189846218 instance=ExtResource("2_gs482")]
 offset_left = 4.0

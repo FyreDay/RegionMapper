@@ -5,6 +5,7 @@ signal popup_closed
 signal hovered_region_update
 signal hovered_entrance_update
 signal save_data_ready
+signal load_flag_names
 
 var region_scene = preload("res://region.tscn")
 var entrance_scene = preload("res://entrance.tscn")
@@ -17,6 +18,8 @@ var mergingRegion = null
 var hovered_region = null
 var entrance_from_region = null
 var index = 0
+
+var flag_names:= []
 
 var undo_redo: UndoRedo
 # Called when the node enters the scene tree for the first time.
@@ -60,7 +63,7 @@ func _unhandled_input(event: InputEvent) -> void:
             return
         var object = get_hovered_object()
         if object:
-            object.open_edit_menu()
+            object.open_edit_menu(object, flag_names)
     if event.is_action_pressed("click"):
         var object = get_hovered_object()
         if isMerging and object is Region:
@@ -75,7 +78,7 @@ func _draw() -> void:
     if isDrawingRegion:
         draw_rect(Rect2(dragStartMousePos, dragSizeVector), Color(1,1,1,.5))
     if isDrawingEntrance:
-        var duel_directonal = Input.is_key_pressed(KEY_CTRL)
+        var duel_directonal = Input.is_key_pressed(KEY_ALT)
         var arrow_length := 15.0
         var arrow_width := 8.0
         
@@ -219,7 +222,7 @@ func create_entrance(from_region, to_region, from_pos, to_pos, dual_directional)
     while not is_valid_entrance_name(new_name):
         index += 1
         new_name = name_base + ' (' + str(index) + ')'
-    entrance.setup(from_region, to_region, from_pos, to_pos, dual_directional, new_name)
+    entrance.setup(from_region, to_region, from_pos, to_pos, dual_directional, new_name, 0)
     connect_entrance_signals(entrance)
     undo_redo.create_action("Create Entrance")
     undo_redo.add_do_method(add_child.bind(entrance))
@@ -261,6 +264,7 @@ func _on_popup_closed() -> void:
     popup_closed.emit()
 
 func _on_delete_region(region) -> void:
+    popup_closed.emit() 
     undo_redo.create_action("Delete Region")
     undo_redo.add_do_method(delete_region_and_reference.bind(region))
     undo_redo.add_undo_method(redo_region_and_reference.bind(region))
@@ -268,7 +272,14 @@ func _on_delete_region(region) -> void:
 
 func delete_region_and_reference(region):
     if not region.is_merge_controller:
-        region.merge_controller.remove_region_reference(region) 
+        region.merge_controller.remove_region_reference(region)
+    elif region.region_references.size() > 0:
+        var new_parent_region = region.region_references[0]
+        new_parent_region.merge_controller = null
+        new_parent_region.is_merge_controller = true
+        new_parent_region.region_references = region.region_references.slice(1)
+        for new_child in new_parent_region.region_references:
+            new_child.merge_controller = new_parent_region
     remove_child.call_deferred(region)
     
 func redo_region_and_reference(region):
@@ -319,19 +330,21 @@ func _on_region_color_change_requested(region, new_color, old_color):
     
 func _on_region_drag_ended(region, old_pos, new_pos):
     undo_redo.create_action("Drag Region")
-    undo_redo.add_do_method(manage_pos.bind(region, new_pos))
-    undo_redo.add_undo_method(manage_pos.bind(region, old_pos))
+    undo_redo.add_do_method(manage_pos.bind(region, new_pos, old_pos))
+    undo_redo.add_undo_method(manage_pos.bind(region, old_pos, new_pos))
     undo_redo.commit_action()
     
-func manage_pos(region, pos: Vector2):
-    region.set_rect_pos.bind(pos)
+func manage_pos(region, pos: Vector2, from_pos: Vector2):
+    var offset = pos - from_pos
     for child in get_children():
         if child is Entrance:
-            if child.to_region == region:
-                child.set_endpoint(Entrance.endpoints.TO_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.TO_ENDPOINT) + child.get_offset(Entrance.endpoints.TO_ENDPOINT))
-            if child.from_region == region:
-                child.set_endpoint(Entrance.endpoints.FROM_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.FROM_ENDPOINT) + child.get_offset(Entrance.endpoints.FROM_ENDPOINT))
-    
+            if Rect2(from_pos, region.node_rect.size).has_point(region.to_local(child.get_endpoint_pos(Entrance.endpoints.TO_ENDPOINT))):
+                child.set_endpoint(Entrance.endpoints.TO_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.TO_ENDPOINT) + offset )
+                child.set_offset(Entrance.endpoints.TO_ENDPOINT,Vector2.ZERO)
+            if Rect2(from_pos, region.node_rect.size).has_point(region.to_local(child.get_endpoint_pos(Entrance.endpoints.FROM_ENDPOINT))):
+                child.set_endpoint(Entrance.endpoints.FROM_ENDPOINT, child.get_endpoint_pos(Entrance.endpoints.FROM_ENDPOINT) + offset)
+                child.set_offset(Entrance.endpoints.FROM_ENDPOINT,Vector2.ZERO)
+    region.set_rect_pos(pos)
 
 func _on_region_resize_ended(region, old_size, new_size):
     undo_redo.create_action("Resize Region")
@@ -342,13 +355,13 @@ func _on_region_resize_ended(region, old_size, new_size):
 func _on_drag_moved(region, _old_pos, offset):
     for child in get_children():
         if child is Entrance:
-            if child.to_region == region:
+            if region.is_mouse_over(child.to_pos):
                 child.set_offset(Entrance.endpoints.TO_ENDPOINT, offset)
-            if child.from_region == region:
+            if region.is_mouse_over(child.from_pos):
                 child.set_offset(Entrance.endpoints.FROM_ENDPOINT, offset)
             
 func _on_delete_entrance(entrance):
-    
+    popup_closed.emit() 
     undo_redo.create_action("Delete Entrance")
     undo_redo.add_do_method(remove_child.bind(entrance))
     undo_redo.add_undo_method(add_child.bind(entrance))
@@ -386,7 +399,23 @@ func _on_entrance_name_change_requested(entrance, new_name):
     undo_redo.add_undo_method(entrance.set_entrance_name.bind(old_name))
 
     undo_redo.commit_action()
-    
+
+func _on_flags_updated(new_flags:Array):
+    var conversion := {}
+    for old_index in flag_names.size():
+        var new_index := new_flags.find(flag_names[old_index])
+        if new_index != -1:
+            conversion[old_index] = new_index
+            
+    for child in get_children():
+        if child is Entrance:
+            var new_value = 0
+            for old_index in conversion:
+                if child.flags & (1 << old_index):
+                    new_value |= 1 << conversion[old_index]
+            child.flags = new_value
+    print(new_flags)
+    flag_names = new_flags
     
 func string_to_id(text: String) -> String:
     # Replace spaces and hyphens with underscores
@@ -397,7 +426,8 @@ func string_to_id(text: String) -> String:
 func save_data():
     var data = {
         "regions": [],
-        "entrances": []
+        "entrances": [],
+        "flag_names": flag_names
     }  
     var region_ids := {}
 
@@ -447,7 +477,12 @@ func save_data():
                     child.to_pos.x,
                     child.to_pos.y
                 ],
+                "plate_pos" : [
+                    child.box_center.x,
+                    child.box_center.y
+                ],
                 "id" : string_to_id(child.entrance_name),
+                "flags": child.flags,
                 "name": child.entrance_name,
                 "rule_name": rule_name,
                 "dual_directional": child.duel_directonal
@@ -460,6 +495,8 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
     var regions = []
     var entrances = []
     #setup regions
+    var new_flag_names = data.get("flag_names", [])
+    
     for region_data in data.get("regions", []):
         var region = region_scene.instantiate()
 
@@ -522,37 +559,47 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
             entrance_data.to_pos[0],
             entrance_data.to_pos[1]
         )
+        var plate_pos: Vector2
+        if entrance_data.has("plate_pos"):
+            plate_pos = Vector2(
+                entrance_data.plate_pos[0],
+                entrance_data.plate_pos[1]
+            )
 
         var entrance = entrance_scene.instantiate()
-
+        add_child(entrance)
         entrance.setup(
             from_region,
             to_region,
             from_pos,
             to_pos,
             entrance_data.dual_directional,
-            entrance_data.name
+            entrance_data.name,
+            entrance_data.flags
         )
-        
-
+        if plate_pos:
+            entrance.set_endpoint(Entrance.endpoints.NAME_BOX, plate_pos)
         connect_entrance_signals(entrance)
 
-        add_child(entrance)
+        
         entrances.append(entrance)
         var rule_name = entrance_data.get("rule_name")
         if rule_name != "":
             entrance.set_rule(rule_combo_manager.get_rule_combo(rule_name))
-    undo_load(regions, entrances)
+    undo_load(regions, entrances, flag_names)
+    flag_names = new_flag_names
+    load_flag_names.emit(flag_names)
         
-func undo_load(regions, entrances):
+func undo_load(regions, entrances, old_flag_names):
     undo_redo.create_action("Undo Load")
     undo_redo.add_do_method(print.bind("Save Done"))
-    undo_redo.add_undo_method(remove_select_children.bind(regions, entrances))
+    undo_redo.add_undo_method(remove_select_children.bind(regions, entrances, old_flag_names))
     undo_redo.commit_action()
     
-func remove_select_children(regions, entrances):
+func remove_select_children(regions, entrances, old_flag_names):
     for region in regions:
         delete_region_and_reference(region)
     for entrance in entrances:
         remove_child(entrance)
+    flag_names = old_flag_names
         

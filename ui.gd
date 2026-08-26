@@ -10,7 +10,8 @@ signal save_path(path: String)
 signal export_path(dir: String)
 signal rule_builder_toggled(bool)
 signal request_web_import
-signal request_web_map_import  
+signal request_web_map_import
+signal flags_updated
 
 signal region_scale_changed(float)
 
@@ -31,11 +32,14 @@ signal region_scale_changed(float)
 
 @onready var rule_manager: RuleManager = $CanvasLayer/RuleEditor/RulePartPanel/ScrollContainer/RuleManager
 @onready var rule_palette_manager: RulePaletteManager = $CanvasLayer/PalettePanel/ScrollContainer/RulePaletteManager
+@onready var entrance_group_panel: PopupPanel = $EntranceGroupPopupPanel
 
 @onready var custom_rule_creator: CustomRuleCreator = $CustomRuleCreator
 
 @onready var hint_panel: PopupPanel = $ControlHintPanel
 @onready var scale_spinner: SpinBox = $CanvasLayer/Panel/HBoxContainer/ScaleSpinBox
+
+@onready var group_editor: GroupEditor = $EntranceGroupPopupPanel/EntranceGroupEditor
 
 var dragable = preload("res://rules/Dragable_Rule.tscn")
 
@@ -46,6 +50,7 @@ var selected_dragable_rule_combo:DragableRuleNameEdit
 func _ready() -> void:
     root_rule_spot.hide()
     root_rule_label.text = "Select a rule from the palette"
+    group_editor.changed.connect(flags_updated.emit)
 
 func _process(delta: float) -> void:
     slide_panel(delta)
@@ -156,3 +161,13 @@ func set_scale_spinner(value: float):
 
 func _on_control_hint_pressed() -> void:
     hint_panel.popup()
+
+func _on_open_flags_button_pressed() -> void:
+    entrance_group_panel.popup()
+
+
+func _on_entrance_group_popup_panel_popup_hide() -> void:
+    pass
+    
+func _on_flags_updated(arr:Array):
+    group_editor.load_array(arr)

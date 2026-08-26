@@ -15,7 +15,7 @@ script = ExtResource("1_4bqal")
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 155.0
-offset_bottom = 141.0
+offset_bottom = 180.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -27,6 +27,10 @@ emoji_menu_enabled = false
 [node name="IsTwoWay" type="CheckBox" parent="EditMenu/VBoxContainer" unique_id=761565201]
 layout_mode = 2
 text = "Two Way"
+
+[node name="ResetPlate" type="Button" parent="EditMenu/VBoxContainer" unique_id=746074876]
+layout_mode = 2
+text = "Reset Name Plate"
 
 [node name="RuleContainer" type="HBoxContainer" parent="EditMenu/VBoxContainer" unique_id=1419514603]
 layout_mode = 2
@@ -45,6 +49,17 @@ expand_to_text_length = true
 layout_mode = 2
 texture_normal = ExtResource("3_051eu")
 
+[node name="FlagContainer" type="HBoxContainer" parent="EditMenu/VBoxContainer" unique_id=294668429]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="EditMenu/VBoxContainer" unique_id=860357923]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="EditMenu/VBoxContainer" unique_id=706919198]
+custom_minimum_size = Vector2(0, 15)
+layout_mode = 2
+
 [node name="DeleteButton" type="Button" parent="EditMenu/VBoxContainer" unique_id=812100834]
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_4bqal")
@@ -60,5 +75,6 @@ selecting_enabled = false
 [connection signal="popup_hide" from="EditMenu" to="." method="_on_edit_menu_popup_hide"]
 [connection signal="text_changed" from="EditMenu/VBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="toggled" from="EditMenu/VBoxContainer/IsTwoWay" to="." method="_on_is_two_way_toggled"]
+[connection signal="pressed" from="EditMenu/VBoxContainer/ResetPlate" to="." method="_on_reset_plate_pressed"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/RuleContainer/DeleteRule" to="." method="_on_delete_rule_pressed"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]

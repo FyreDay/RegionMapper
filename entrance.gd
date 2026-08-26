@@ -12,16 +12,21 @@ signal endpoint_drag_ended(entrance, endpoint, old_pos, new_pos)
 @onready var name_edit: LineEdit = $EditMenu/VBoxContainer/NameEdit
 @onready var rule_name: LineEdit = $EditMenu/VBoxContainer/RuleContainer/LineEdit
 @onready var rule_plate: LineEdit = $RulePlate
+@onready var flag_container: HBoxContainer = $EditMenu/VBoxContainer/FlagContainer
 
-enum endpoints { FROM_ENDPOINT, TO_ENDPOINT, NONE}
+var flag_toggle = preload("res://flag_box.tscn")
+
+enum endpoints { FROM_ENDPOINT, TO_ENDPOINT, NAME_BOX, NONE}
 const ENDPOINT_RADIUS := 20.0
 
 var dragging_endpoint := endpoints.NONE
 var drag_start_pos: Vector2
 var drag_old_pos: Vector2
+var drag_plate_pos: Vector2
 
 var from_pos: Vector2
 var to_pos: Vector2
+var drag_pos: Vector2
 var duel_directonal = false
 var from_region
 var to_region
@@ -29,31 +34,32 @@ var entrance_name
 var updating_rule_edit: = false
 var auto_update_name:= false
 var name_box:Rect2
+var box_center: Vector2
 var hovered_region
 var to_endpoint_offset := Vector2.ZERO
 var from_endpoint_offset := Vector2.ZERO
 var rule_combo:RuleCombo
 
-# Called when the node enters the scene tree for the first time.
+var flags:int
+
 func _ready() -> void:
     z_index = 10
     rule_plate.hide()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
     pass
 
-func setup(new_from_region, new_to_region, new_from_pos, new_to_pos, new_duel_directonal, new_name):
+func setup(new_from_region, new_to_region, new_from_pos, new_to_pos, new_duel_directonal, new_name, new_flags):
     self.from_region = new_from_region
     self.to_region = new_to_region
     self.from_pos = new_from_pos
     self.to_pos = new_to_pos
     self.duel_directonal = new_duel_directonal
     self.entrance_name = new_name
+    self.flags = new_flags
     show_behind_parent = true
-    var midpoint: Vector2 = (from_pos + to_pos) / 2.0
-    self.name_box = Rect2(midpoint - Vector2(30,20) / 2.0, Vector2(30,20))
+    box_center = (from_pos + to_pos) / 2.0
+    self.name_box = Rect2(box_center - Vector2(30,20) / 2.0, Vector2(30,20))
         
 
 func is_mouse_over(global_mouse_pos: Vector2) -> bool:
@@ -61,7 +67,6 @@ func is_mouse_over(global_mouse_pos: Vector2) -> bool:
 
     if name_box.has_point(mouse_pos):
         return true
-    #endpoint detection maybe
     return false
     
 func _unhandled_input(event: InputEvent) -> void:
@@ -80,8 +85,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
                     if endpoint == endpoints.FROM_ENDPOINT:
                         drag_old_pos = from_pos
-                    else:
+                    elif endpoint == endpoints.FROM_ENDPOINT:
                         drag_old_pos = to_pos
+                    elif endpoint == endpoints.NAME_BOX:
+                        drag_old_pos == box_center
 
                     endpoint_drag_started.emit(self, endpoint)
                     get_viewport().set_input_as_handled()
@@ -91,9 +98,14 @@ func _unhandled_input(event: InputEvent) -> void:
                     return
                 var endpoint := dragging_endpoint
                 dragging_endpoint = endpoints.NONE
-
-                var new_pos := from_pos if endpoint == endpoints.FROM_ENDPOINT else to_pos
-
+    
+                var new_pos = Vector2.ZERO
+                if endpoint == endpoints.FROM_ENDPOINT:
+                    new_pos = from_pos
+                elif endpoint == endpoints.TO_ENDPOINT:
+                    new_pos = to_pos
+                elif endpoint == endpoints.NAME_BOX:
+                    new_pos = box_center
                 endpoint_drag_ended.emit(
                     self,
                     endpoint,
@@ -109,36 +121,49 @@ func _unhandled_input(event: InputEvent) -> void:
             if dragging_endpoint == endpoints.FROM_ENDPOINT:
                 if from_region.is_mouse_over_merge(mouse_pos):
                     from_pos = mouse_pos
-            else:
+            elif dragging_endpoint == endpoints.TO_ENDPOINT:
                 if to_region.is_mouse_over_merge(mouse_pos):
                     to_pos = mouse_pos
+            elif dragging_endpoint == endpoints.NAME_BOX:
+                box_center = mouse_pos
             queue_redraw()
             get_viewport().set_input_as_handled()
 
       
 func get_endpoint_at_position(mouse_pos: Vector2) -> endpoints:
+    if name_box.has_point(to_local(mouse_pos)):
+        return endpoints.NAME_BOX
     if mouse_pos.distance_to(from_pos) <= ENDPOINT_RADIUS:
         return endpoints.FROM_ENDPOINT
 
     if mouse_pos.distance_to(to_pos) <= ENDPOINT_RADIUS:
         return endpoints.TO_ENDPOINT
-
+    
     return endpoints.NONE
             
-func open_edit_menu():
+func open_edit_menu(_caller, flag_names:Array):
     popup_opened.emit()
     name_edit.text = entrance_name
     updating_rule_edit = true
     updating_rule_edit = false
     edit_menu.position = get_viewport().get_mouse_position()
     edit_menu.reset_size()
+    for index in flag_names.size():
+        print(flag_names[index])
+        var toggle = flag_toggle.instantiate()
+        flag_container.add_child(toggle)
+        toggle.setup(index, flag_names[index], (flags & (1 << index)) != 0)
+        toggle.checked.connect(_on_toggle_flag)
     edit_menu.popup()
+    queue_redraw()
 
+func _on_toggle_flag(index, checked):
+    flags |= int(checked) << index
 
 func _draw() -> void:
     
-    draw_arrow(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset)
-    draw_nameplate(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset)
+    draw_arrow(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset, box_center)
+    draw_nameplate(to_pos + to_endpoint_offset, from_pos + from_endpoint_offset, )
     update_rule_plate()
 
 func update_rule_plate():
@@ -148,9 +173,6 @@ func draw_nameplate(to_pos_draw: Vector2, from_pos_draw: Vector2):
     var font := ThemeDB.fallback_font
     var font_size := 16
     var padding := 6.0
-
-    var midpoint := (from_pos_draw + to_pos_draw) / 2.0
-
     var text_size := font.get_string_size(
         entrance_name,
         HORIZONTAL_ALIGNMENT_LEFT,
@@ -159,7 +181,7 @@ func draw_nameplate(to_pos_draw: Vector2, from_pos_draw: Vector2):
     )
 
     var box_size := text_size + Vector2(padding * 2, padding * 2)
-    name_box = Rect2(midpoint - box_size / 2.0, box_size)
+    name_box = Rect2(box_center - box_size / 2.0, box_size)
 
     draw_rect(name_box, Color.WHITE)
     draw_rect(name_box, Color.BLACK, false, 2.0)
@@ -179,59 +201,60 @@ func draw_nameplate(to_pos_draw: Vector2, from_pos_draw: Vector2):
         Color.BLACK
     )
 
-func draw_arrow(to_pos_draw: Vector2, from_pos_draw: Vector2):
+func draw_arrow(to_pos_draw: Vector2, from_pos_draw: Vector2, box_center_draw: Vector2):
     var arrow_length := 15.0
     var arrow_width := 8.0
-    
     var start := from_pos_draw
     var end := to_pos_draw
-    
     # Direction and perpendicular
-    var direction := (end - start).normalized()
-    var perpendicular := Vector2(-direction.y, direction.x)
+    var start_direction := (box_center_draw - start).normalized()
+    var end_direction := (end - box_center_draw).normalized()
+    var start_perpendicular := Vector2(-start_direction.y, start_direction.x)
+    var end_perpendicular := Vector2(-end_direction.y, end_direction.x)
     
-    end = end - direction * arrow_length
+    
+    end = end - end_direction * arrow_length
     if duel_directonal:
-        start = start + direction * arrow_length
-    draw_line(start, end, Color.BLACK, 8, true)
-    
+        start = start + start_direction * arrow_length
+    draw_line(start, box_center_draw, Color.BLACK, 8, true)
+    draw_line(box_center_draw, end, Color.BLACK, 8, true)
 
     if duel_directonal:
         draw_colored_polygon(
             PackedVector2Array([
-                start + 2 * direction - direction * arrow_length,
-                start + 2 * direction + perpendicular * arrow_width,
-                start + 2 * direction - perpendicular * arrow_width
+                start + 2 * start_direction - start_direction * arrow_length,
+                start + 2 * start_direction + start_perpendicular * arrow_width,
+                start + 2 * start_direction - start_perpendicular * arrow_width
             ]),
             Color.BLACK
         )
     draw_colored_polygon(
         PackedVector2Array([
-            end - 2 * direction + direction * arrow_length, 
-            end - 2 * direction + perpendicular * arrow_width, 
-            end - 2 * direction - perpendicular * arrow_width
+            end - 2 * end_direction + end_direction * arrow_length, 
+            end - 2 * end_direction + end_perpendicular * arrow_width, 
+            end - 2 * end_direction - end_perpendicular * arrow_width
             ]),
         Color.BLACK
     )
-    draw_line(start - direction * 2, end + direction * 2, Color.WHITE, 6, true)
-
+    draw_line(start - start_direction * 2, box_center_draw + start_direction * 2, Color.WHITE, 6, true)
+    draw_line(box_center_draw - end_direction * 2, end + end_direction * 2, Color.WHITE, 6, true)
     var inner_length := 12.0
     var inner_width := 6.0
     if duel_directonal:
         draw_colored_polygon(
             PackedVector2Array([
-                start + 1 * direction - direction * inner_length, 
-                start + 1 * direction + perpendicular * inner_width, 
-                start + 1 * direction - perpendicular * inner_width
+                start + 1 * start_direction - start_direction * inner_length, 
+                start + 1 * start_direction + start_perpendicular * inner_width, 
+                start + 1 * start_direction - start_perpendicular * inner_width
             ]),
             Color.WHITE
         )
 
     draw_colored_polygon(
         PackedVector2Array([
-            end - 1 * direction + direction * inner_length, 
-            end - 1 * direction + perpendicular * inner_width, 
-            end - 1 * direction - perpendicular * inner_width
+            end - 1 * end_direction + end_direction * inner_length, 
+            end - 1 * end_direction + end_perpendicular * inner_width, 
+            end - 1 * end_direction - end_perpendicular * inner_width
             ]),
         Color.WHITE
     )
@@ -280,9 +303,11 @@ func set_endpoint(endpoint, new_pos):
     if endpoint == endpoints.FROM_ENDPOINT:
         from_pos = new_pos
         from_endpoint_offset = Vector2.ZERO
-    else:
+    elif endpoint == endpoints.TO_ENDPOINT:
         to_pos = new_pos
         to_endpoint_offset = Vector2.ZERO
+    elif endpoint == endpoints.NAME_BOX:
+        box_center = new_pos
     queue_redraw()
 
 func set_offset(endpoint: endpoints, offset: Vector2):
@@ -300,6 +325,8 @@ func get_offset(endpoint: endpoints):
 
 func _on_edit_menu_popup_hide() -> void:
     name_edit.remove_theme_stylebox_override("normal")
+    for child in flag_container.get_children():
+        flag_container.remove_child(child)
     popup_closed.emit()
 
 
@@ -319,4 +346,9 @@ func _on_delete_rule_pressed() -> void:
 
 func _on_is_two_way_toggled(toggled_on: bool) -> void:
     duel_directonal = toggled_on
+    queue_redraw()
+
+
+func _on_reset_plate_pressed() -> void:
+    box_center = (to_pos + to_endpoint_offset + from_pos + from_endpoint_offset) / 2.0
     queue_redraw()

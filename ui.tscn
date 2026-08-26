@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://dul0iyid6mrdt"]
 
 [ext_resource type="Script" uid="uid://dhq3kxbfkgart" path="res://ui.gd" id="1_fyqef"]
+[ext_resource type="PackedScene" uid="uid://cie5aqajygw2w" path="res://entrance_group_editor.tscn" id="2_gs482"]
 [ext_resource type="Texture2D" uid="uid://bboquyyjxa6yl" path="res://assets/burger.png" id="2_m6e0p"]
 [ext_resource type="PackedScene" uid="uid://mitf4vuurruh" path="res://rules/menus/custom_rule_creator.tscn" id="2_n5rqp"]
 [ext_resource type="Texture2D" uid="uid://ohxsu3i88sia" path="res://assets/burger_click.png" id="3_nltto"]
@@ -153,7 +154,7 @@ initial_position = 1
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 648.0
-offset_bottom = 495.0
+offset_bottom = 521.0
 text = "ctrl+left click: Drag a new Region
 ctrl+right click: Drag new Entrance
 ctrl+alt+right click: Drag new two way Entrance
@@ -174,6 +175,17 @@ Dragable objects:
 -Rules from palette (drag onto Entrance Name Plates)
 
 Load will add all loaded data into your current session. THIS MAY CAUSE CONFLICTS"
+
+[node name="EntranceGroupPopupPanel" type="PopupPanel" parent="." unique_id=308336331]
+initial_position = 1
+size = Vector2i(600, 600)
+unresizable = false
+
+[node name="EntranceGroupEditor" parent="EntranceGroupPopupPanel" unique_id=1189846218 instance=ExtResource("2_gs482")]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 596.0
+offset_bottom = 596.0
 
 [node name="CustomRuleCreator" parent="." unique_id=489813692 instance=ExtResource("2_n5rqp")]
 layout_mode = 1
@@ -216,9 +228,19 @@ text = "Load Data"
 layout_mode = 2
 text = "Export To Python"
 
+[node name="CSVExportButton" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1323173664]
+visible = false
+layout_mode = 2
+text = "Export To CSV"
+
 [node name="Control" type="Control" parent="CanvasLayer/Panel/HBoxContainer" unique_id=483733643]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="OpenFlagsButton" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1535915516]
+visible = false
+layout_mode = 2
+text = "Edit Entrance Groups"
 
 [node name="Label" type="Label" parent="CanvasLayer/Panel/HBoxContainer" unique_id=1093568883]
 layout_mode = 2
@@ -430,11 +452,13 @@ title = "Are You Sure?"
 [connection signal="file_selected" from="FileLoadDialog" to="." method="_on_file_load_dialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_save_file_dialog_file_selected"]
 [connection signal="dir_selected" from="ExportDirDialog" to="." method="_on_export_dir_dialog_dir_selected"]
+[connection signal="popup_hide" from="EntranceGroupPopupPanel" to="." method="_on_entrance_group_popup_panel_popup_hide"]
 [connection signal="toggled" from="CanvasLayer/Panel/HBoxContainer/SlideToggle" to="." method="_on_slide_toggle_toggled"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/ImageButton" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/SaveButton" to="." method="_on_save_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/LoadButton" to="." method="_on_load_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/ExportButton" to="." method="_on_export_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/OpenFlagsButton" to="." method="_on_open_flags_button_pressed"]
 [connection signal="value_changed" from="CanvasLayer/Panel/HBoxContainer/ScaleSpinBox" to="." method="_on_spin_box_value_changed"]
 [connection signal="pressed" from="CanvasLayer/Panel/HBoxContainer/ControlHint" to="." method="_on_control_hint_pressed"]
 [connection signal="toggled" from="CanvasLayer/PalettePanel/Title/RuleBuilderToggle" to="." method="_on_rule_builder_toggled"]

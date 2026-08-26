@@ -32,6 +32,8 @@ func _ready() -> void:
 
     ui.request_web_import.connect(_start_web_zip_upload)
     ui.request_web_map_import.connect(_start_web_png_upload)
+    ui.flags_updated.connect(node_manager._on_flags_updated)
+    node_manager.load_flag_names.connect(ui._on_flags_updated)
 
 func _process(_delta: float) -> void:
     pass
@@ -45,10 +47,6 @@ func _input(event: InputEvent) -> void:
         undo_redo.undo()
         get_viewport().set_input_as_handled()
     
-# ---------------------------------------------------------------------------
-# Loading a project zip (shared by desktop FileDialog and web upload)
-# ---------------------------------------------------------------------------
-
 func _on_load_data(path):
     var zip := ZIPReader.new()
     var err := zip.open(path)
@@ -118,10 +116,6 @@ func _on_load_data(path):
 
     zip.close()
 
-# ---------------------------------------------------------------------------
-# Saving a project zip (shared helper, called from both desktop and web paths)
-# ---------------------------------------------------------------------------
-
 func _on_save_data():
     var data = {"nodes": node_manager.save_data(), "rules": ui.save_rule_data()}
     pending_json = JSON.stringify(data)
@@ -151,9 +145,6 @@ func _on_save_path(path):
 
     print("Saved to: ", path)
 
-# Writes data.json + metadata.json + (optional) image into a zip at `path`.
-# `path` can be a real OS path (desktop) or a user:// path (web tmp file) —
-# ZIPPacker/FileAccess both resolve user:// the same on every platform.
 func _write_project_zip(path: String) -> Error:
     var zip := ZIPPacker.new()
     var err := zip.open(path)
@@ -191,11 +182,6 @@ func _download_project_zip() -> void:
 
     JavaScriptBridge.download_buffer(bytes, "map.zip", "application/zip")
 
-# ---------------------------------------------------------------------------
-# Python export — zipped on both platforms; written to disk on desktop,
-# downloaded on web (there's no folder picker on web to write loose files to)
-# ---------------------------------------------------------------------------
-
 func write_file(path: String, contents: String):
     var file := FileAccess.open(path, FileAccess.WRITE)
     if file == null:
@@ -220,9 +206,6 @@ func _on_export_data(dir:String):
     write_file(dir.path_join("regions.py"), regions_py)
     write_file(dir.path_join("entrances.py"), entrances_py)
 
-# Zips an arbitrary {filename: PackedByteArray} dict into memory and returns
-# the finished zip's bytes. Uses a user:// tmp file since ZIPPacker needs a
-# backing path, then reads it back and deletes it.
 func _zip_files_to_bytes(files: Dictionary) -> PackedByteArray:
     var tmp_path := "user://_tmp_export.zip"
     var zip := ZIPPacker.new()
@@ -291,11 +274,6 @@ func get_rule_dict(rule_name: String):
         return ""
     return (', ' +  JSON.stringify(combo.root.to_dict()))
 
-# ---------------------------------------------------------------------------
-# Web-only: browser file upload via a hidden <input type="file">.
-# JS hands binary data back as a JavaScriptObject wrapping an ArrayBuffer —
-# js_buffer_to_packed_byte_array() converts it to a real PackedByteArray.
-# ---------------------------------------------------------------------------
 
 func _start_web_zip_upload() -> void:
     _web_zip_upload_callback = JavaScriptBridge.create_callback(_on_web_zip_uploaded)

@@ -33,6 +33,7 @@ var drag_old_pos: Vector2
 var merge_controller
 var region_references
 var is_merge_controller
+var popup_caller:Region = null
 
 
 
@@ -168,6 +169,9 @@ func set_rect_size(size):
     queue_redraw()
     
 func is_mouse_over(global_mouse_pos: Vector2) -> bool:
+    if current_dragable == Dragables.TOP_BAR:
+        var old_rect = Rect2(drag_old_pos, node_rect.size)
+        return old_rect.has_point(to_local(global_mouse_pos))
     return node_rect.has_point(to_local(global_mouse_pos))
 
 func is_mouse_over_merge(global_mouse_pos: Vector2) -> bool:
@@ -186,10 +190,11 @@ func get_controller():
     return self if is_merge_controller else merge_controller
     
 
-func open_edit_menu():
+func open_edit_menu(caller, _flags):
     if not is_merge_controller:
-        merge_controller.open_edit_menu()
+        merge_controller.open_edit_menu(self)
         return
+    popup_caller = caller
     if get_viewport() == null:
         return
     popup_opened.emit()
@@ -293,7 +298,7 @@ func set_region_color(new_color: Color) -> void:
 
 func _on_delete_button_pressed() -> void:
     edit_menu.hide()
-    delete_region.emit(self)
+    delete_region.emit(popup_caller)
     
 func _on_merge_button_pressed() -> void:
     if is_merge_controller:

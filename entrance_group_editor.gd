@@ -5,6 +5,7 @@ signal changed(Array)
 
 @onready var container: VBoxContainer = $ScrollContainer/EntranceGroupContainer
 @onready var enter: HBoxContainer = $ScrollContainer/EntranceGroupContainer/HBoxContainer
+@onready var name_edit: LineEdit = $ScrollContainer/EntranceGroupContainer/HBoxContainer/LineEdit
 
 var entrance_group = preload("res://entrance_group_type.tscn")
 
@@ -50,6 +51,12 @@ func clear():
         if child is EntranceGroupType:
             container.remove_child(child)
     
-        
-    
-    
+
+
+func _on_line_edit_gui_input(event: InputEvent) -> void:
+    if event is InputEventKey and event.pressed:
+        print("enter")
+        if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+            get_viewport().set_input_as_handled()
+            _on_line_edit_text_submitted(name_edit.text)
+            name_edit.text = ""

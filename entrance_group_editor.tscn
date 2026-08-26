@@ -37,7 +37,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="ScrollContainer/EntranceGroupContainer/HBoxContainer" unique_id=600887001]
 layout_mode = 2
-text = "Enter Name"
+text = "Submit Name"
 
 [node name="LineEdit" type="LineEdit" parent="ScrollContainer/EntranceGroupContainer/HBoxContainer" unique_id=529005445]
 layout_mode = 2
@@ -45,4 +45,5 @@ expand_to_text_length = true
 context_menu_enabled = false
 emoji_menu_enabled = false
 
+[connection signal="gui_input" from="ScrollContainer/EntranceGroupContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_gui_input"]
 [connection signal="text_submitted" from="ScrollContainer/EntranceGroupContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]

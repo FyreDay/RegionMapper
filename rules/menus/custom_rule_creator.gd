@@ -44,3 +44,8 @@ func popup(editable_custom_rule, manager: RuleManager, dl:DragLayer):
     edit_menu.popup()
     
     
+
+
+func _on_rule_name_gui_input(event: InputEvent) -> void:
+     if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+        get_viewport().set_input_as_handled()

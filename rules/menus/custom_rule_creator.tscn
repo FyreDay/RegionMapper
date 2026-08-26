@@ -38,6 +38,8 @@ text = "Rule Name"
 layout_mode = 2
 alignment = 1
 expand_to_text_length = true
+shortcut_keys_enabled = false
+drag_and_drop_selection_enabled = false
 
 [node name="SaveBanner" type="HBoxContainer" parent="PopupPanel/PanelContainer/VBoxParent" unique_id=1649009965]
 layout_mode = 2
@@ -72,6 +74,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Delete"
 
+[connection signal="gui_input" from="PopupPanel/PanelContainer/VBoxParent/NameBanner/RuleName" to="." method="_on_rule_name_gui_input"]
 [connection signal="text_changed" from="PopupPanel/PanelContainer/VBoxParent/NameBanner/RuleName" to="." method="_on_rule_name_text_changed"]
 [connection signal="pressed" from="PopupPanel/PanelContainer/VBoxParent/SaveBanner/Save" to="." method="_on_save_pressed"]
 [connection signal="pressed" from="PopupPanel/PanelContainer/VBoxParent/Buttons/Button" to="." method="_on_button_pressed"]

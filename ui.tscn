@@ -449,6 +449,24 @@ script = ExtResource("5_ibotj")
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="CanvasLayer/DragLayer" unique_id=894915938]
 title = "Are You Sure?"
 
+[node name="Control" type="Control" parent="." unique_id=2064143370]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Label" type="Label" parent="Control" unique_id=42099209]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "v0.1.0"
+
 [connection signal="file_selected" from="FilePngDialog" to="." method="_on_file_dialog_file_selected"]
 [connection signal="file_selected" from="FileLoadDialog" to="." method="_on_file_load_dialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_save_file_dialog_file_selected"]

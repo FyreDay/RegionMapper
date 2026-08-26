@@ -149,7 +149,6 @@ func open_edit_menu(_caller, flag_names:Array):
     edit_menu.position = get_viewport().get_mouse_position()
     edit_menu.reset_size()
     for index in flag_names.size():
-        print(flag_names[index])
         var toggle = flag_toggle.instantiate()
         flag_container.add_child(toggle)
         toggle.setup(index, flag_names[index], (flags & (1 << index)) != 0)
@@ -158,7 +157,10 @@ func open_edit_menu(_caller, flag_names:Array):
     queue_redraw()
 
 func _on_toggle_flag(index, checked):
-    flags |= int(checked) << index
+    if checked:
+        flags |= 1 << index
+    else:
+        flags &= ~(1 << index)
 
 func _draw() -> void:
     

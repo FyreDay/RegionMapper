@@ -193,7 +193,7 @@ func write_file(path: String, contents: String):
 func _on_export_data(dir:String):
     var save_data = node_manager.save_data()
     var regions_py := generate_regions_python(save_data.regions)
-    var entrances_py := generate_entrances_python(save_data.entrances)
+    var entrances_py := generate_entrances_python(save_data.entrances, save_data.flag_names)
 
     if OS.get_name() == "Web":
         var bytes := _zip_files_to_bytes({
@@ -235,35 +235,53 @@ func generate_regions_python(data) -> String:
     return output
 
 const ENTRANCES_HEADER := """\
-from enum import Enum
-
+from enum import Enum, IntFlag
 from .regions import Regions
 from rule_builder.rules import True_
+from BaseClasses import EntranceType
 
+"""
+
+const ENTRANCES_GROUPS:= """\
+class EntranceGroups(IntFlag):
+    NONE = 0
+"""
+
+const ENTRANCES_TYPE_ENUM := """\
 class EntranceTypeEnum(Enum):
-    def __init__(self, value: str, exiting_region: RegionTypeEnum, entering_region: RegionTypeEnum, entrance_group: Number, rule = True_()):
+    def __init__(self, value: str, exiting_region: RegionTypeEnum, entering_region: RegionTypeEnum, type: EntranceType, entrance_group: Number, rule = True_()):
         # self._value_ must be set to the first element to support lookup by value
         self._value_ = value
         self.exiting_screen = exiting_region
         self.entering_screen = entering_region
         self.entrance_group = entrance_group
+        self.entrance_type = type
         self.rule = rule
 
 
 """
 
-func generate_entrances_python(data) -> String:
+func string_to_id(text: String) -> String:
+    # Replace spaces and hyphens with underscores
+    var sanitized = text.strip_edges().replace(" ", "_").replace("-", "_").replace("'", "")
+    # Convert the entire string to uppercase
+    return sanitized.to_upper()
+
+func generate_entrances_python(data, flag_names) -> String:
     var output := ENTRANCES_HEADER
+    
+    output += ENTRANCES_GROUPS
+    for index in flag_names.size():
+        output += ('    ' + string_to_id(flag_names[index]) + ' = 1 << ' + str(index) + '\n')
+    output+='\n'
+        
     output += "class Entrances(EntranceTypeEnum):\n"
     for entrance in data:
-        #TODO:attach entrance group
+
         output += ('    ' + entrance.id + ' = (' + JSON.stringify(entrance.name) +
         ', Regions.' + entrance.from_region + ', Regions.' + entrance.to_region +
-        ', ' + '0' + get_rule_dict(entrance.rule_name) + ')\n')
-        if entrance.dual_directional:
-            output += ('    ' + entrance.id + '_BACK = (' + JSON.stringify(entrance.name + ' Backwards') +
-        ', Regions.' + entrance.to_region + ', Regions.' + entrance.from_region +
-        ', ' + '0' +  get_rule_dict(entrance.rule_name) + ')\n')
+        ', EntranceType.' + ('TWO_WAY' if entrance.dual_directional else 'ONE_WAY') +
+        ', EntranceGroups(' + str(entrance.flags) +')' + get_rule_dict(entrance.rule_name) + ')\n')
     return output
 
 func get_rule_dict(rule_name: String):

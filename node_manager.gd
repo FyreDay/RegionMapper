@@ -414,7 +414,6 @@ func _on_flags_updated(new_flags:Array):
                 if child.flags & (1 << old_index):
                     new_value |= 1 << conversion[old_index]
             child.flags = new_value
-    print(new_flags)
     flag_names = new_flags
     
 func string_to_id(text: String) -> String:
@@ -549,6 +548,7 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
     for entrance_data in data.get("entrances", []):
         var from_region = region_lookup[entrance_data.from_region]
         var to_region = region_lookup[entrance_data.to_region]
+        var flags: int = int(entrance_data.get("flags", 0))
 
         var from_pos := Vector2(
             entrance_data.from_pos[0],
@@ -575,7 +575,7 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
             to_pos,
             entrance_data.dual_directional,
             entrance_data.name,
-            entrance_data.flags
+            flags
         )
         if plate_pos:
             entrance.set_endpoint(Entrance.endpoints.NAME_BOX, plate_pos)

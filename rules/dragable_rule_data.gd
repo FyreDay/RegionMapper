@@ -39,7 +39,6 @@ func _process(delta: float) -> void:
     if not Input.is_action_pressed("click"):
         if drag_layer.hovered_rule_spot == null:
             queue_free()
-            print("destroy myself")
             return
         drag_layer.hovered_rule_spot.set_rule(self)
         dragging = false

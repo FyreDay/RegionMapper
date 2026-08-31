@@ -41,6 +41,7 @@ text = "Delete"
 
 [connection signal="popup_hide" from="EditMenu" to="." method="_on_edit_menu_popup_hide"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/CopyNameButton" to="." method="_on_copy_name_button_pressed"]
+[connection signal="text_changed" from="EditMenu/VBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="color_changed" from="EditMenu/VBoxContainer/ColorChanger" to="." method="_on_color_changer_color_changed"]
 [connection signal="picker_created" from="EditMenu/VBoxContainer/ColorChanger" to="." method="_on_color_changer_picker_created"]
 [connection signal="popup_closed" from="EditMenu/VBoxContainer/ColorChanger" to="." method="_on_color_changer_popup_closed"]

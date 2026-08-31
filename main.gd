@@ -56,6 +56,7 @@ func _input(event: InputEvent) -> void:
     if OS.get_name() == "Web" and event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_V and (event.ctrl_pressed or event.meta_pressed):
             if get_viewport().gui_get_focus_owner() is LineEdit:
+                print("Found Line Edit")
                 get_viewport().set_input_as_handled()
     
 func _on_load_data(path):
@@ -385,7 +386,6 @@ func _on_web_png_uploaded(args: Array) -> void:
     map.set_map(image, file_name, 10)
     
 
-
 func _setup_web_paste_bridge() -> void:
     _web_paste_callback = JavaScriptBridge.create_callback(_on_web_paste)
     var window = JavaScriptBridge.get_interface("window")
@@ -393,21 +393,29 @@ func _setup_web_paste_bridge() -> void:
     JavaScriptBridge.eval("""
     (function() {
         window.addEventListener('paste', function(e) {
+            console.log('[paste] event fired, target=', e.target);
             var cd = e.clipboardData || window.clipboardData;
-            if (!cd) { return; }
+            if (!cd) { console.log('[paste] no clipboardData object'); return; }
             var text = cd.getData('text/plain');
+            console.log('[paste] captured text:', JSON.stringify(text));
             if (window.godotPasteCallback) {
                 window.godotPasteCallback(text);
+            } else {
+                console.log('[paste] godotPasteCallback missing!');
             }
         });
+        console.log('[paste] listener registered');
     })();
     """, true)
 
 func _on_web_paste(args: Array) -> void:
+    print("[paste] _on_web_paste called with: ", args)
     if args.is_empty():
         return
     var text := str(args[0])
     var focused := get_viewport().gui_get_focus_owner()
+    print("[paste] focused node: ", focused)
     if focused is LineEdit:
-        DisplayServer.clipboard_set(text)          # sync engine's cache
+        DisplayServer.clipboard_set(text)
         focused.menu_option(LineEdit.MENU_PASTE)
+        print("[paste] pasted into LineEdit")

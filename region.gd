@@ -192,7 +192,7 @@ func get_controller():
 
 func open_edit_menu(caller, _flags):
     if not is_merge_controller:
-        merge_controller.open_edit_menu(self)
+        merge_controller.open_edit_menu(self, _flags)
         return
     popup_caller = caller
     if get_viewport() == null:

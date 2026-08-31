@@ -92,8 +92,6 @@ func _draw() -> void:
         if duel_directonal:
             start = start + direction * arrow_length
         draw_line(start, end, Color.BLACK, 8, true)
-        
-        
 
         if duel_directonal:
             draw_colored_polygon(

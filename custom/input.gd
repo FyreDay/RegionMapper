@@ -31,44 +31,34 @@ func _setup_web_paste_bridge() -> void:
 
             window.godotPasteListenerInstalled = true;
 
-            document.addEventListener('beforeinput', function(e) {
-                console.log(
-                    '[paste] beforeinput:',
-                    e.inputType,
-                    'data:',
-                    JSON.stringify(e.data)
-                );
+            window.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) &&
+                    (e.key === 'v' || e.key === 'V')) {
 
-                if (e.inputType !== 'insertFromPaste') {
-                    return;
-                }
+                    console.log('[paste] JS Ctrl+V detected');
 
-                console.log('[paste] BEFOREINPUT PASTE');
-
-                var text = e.data;
-
-                /*
-                 * Firefox may provide the data through dataTransfer
-                 * instead of e.data.
-                 */
-                if (text === null || text === undefined) {
-                    if (e.dataTransfer) {
-                        text = e.dataTransfer.getData('text/plain');
+                    if (!navigator.clipboard) {
+                        console.log('[paste] navigator.clipboard unavailable');
+                        return;
                     }
+
+                    navigator.clipboard.readText()
+                        .then(function(text) {
+                            console.log('[paste] clipboard text:', JSON.stringify(text));
+
+                            if (window.godotPasteCallback) {
+                                window.godotPasteCallback(text);
+                            } else {
+                                console.log('[paste] godotPasteCallback missing!');
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('[paste] clipboard.readText() failed:', err);
+                        });
                 }
+            });
 
-                console.log(
-                    '[paste] captured:',
-                    JSON.stringify(text)
-                );
-
-                if (window.godotPasteCallback) {
-                    e.preventDefault();
-                    window.godotPasteCallback(text || '');
-                }
-            }, true);
-
-            console.log('[paste] beforeinput listener registered');
+            console.log('[paste] JS keydown listener registered');
         })();
     """, true)
 

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://mitf4vuurruh"]
 
 [ext_resource type="Script" uid="uid://bgrjg55ke8wjr" path="res://rules/menus/custom_rule_creator.gd" id="1_rrcu7"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_dt2po"]
 
 [node name="CustomRuleCreator" type="Control" unique_id=489813692]
 layout_mode = 3
@@ -34,12 +35,8 @@ layout_mode = 2
 layout_mode = 2
 text = "Rule Name"
 
-[node name="RuleName" type="LineEdit" parent="PopupPanel/PanelContainer/VBoxParent/NameBanner" unique_id=1494744777]
+[node name="RuleName" parent="PopupPanel/PanelContainer/VBoxParent/NameBanner" unique_id=573753716 instance=ExtResource("2_dt2po")]
 layout_mode = 2
-alignment = 1
-expand_to_text_length = true
-shortcut_keys_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="SaveBanner" type="HBoxContainer" parent="PopupPanel/PanelContainer/VBoxParent" unique_id=1649009965]
 layout_mode = 2

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cie5aqajygw2w"]
 
 [ext_resource type="Script" uid="uid://dou1t6nysrncx" path="res://entrance_group_editor.gd" id="1_o0rxy"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_o0rxy"]
 
 [node name="EntranceGroupEditor" type="Control" unique_id=158374470]
 layout_mode = 3
@@ -39,11 +40,8 @@ layout_mode = 2
 layout_mode = 2
 text = "Submit Name"
 
-[node name="LineEdit" type="LineEdit" parent="ScrollContainer/EntranceGroupContainer/HBoxContainer" unique_id=529005445]
+[node name="LineEdit" parent="ScrollContainer/EntranceGroupContainer/HBoxContainer" unique_id=573753716 instance=ExtResource("2_o0rxy")]
 layout_mode = 2
-expand_to_text_length = true
-context_menu_enabled = false
-emoji_menu_enabled = false
 
 [connection signal="gui_input" from="ScrollContainer/EntranceGroupContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_gui_input"]
 [connection signal="text_submitted" from="ScrollContainer/EntranceGroupContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]

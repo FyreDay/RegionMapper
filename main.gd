@@ -8,7 +8,7 @@ var pending_json: String
 var pending_meta_json: String
 var pending_image: Image
 var pending_image_name: String
-
+var has_unsaved_changes := false
 # Keep references to JS callbacks alive until they fire, or they'll be garbage
 # collected and JS's call into them will silently do nothing.
 var _web_zip_upload_callback
@@ -34,8 +34,11 @@ func _ready() -> void:
     ui.request_web_map_import.connect(_start_web_png_upload)
     ui.flags_updated.connect(node_manager._on_flags_updated)
     node_manager.load_flag_names.connect(ui._on_flags_updated)
+    node_manager.hasdata.connect(ui.change_to_override)
+    ui.data_changed.connect(set_unsaved_changes.bind(true))
     
-    
+    if OS.get_name() == "Web":
+        _setup_beforeunload()
 
 func _process(_delta: float) -> void:
     pass
@@ -170,7 +173,8 @@ func _write_project_zip(path: String) -> Error:
         zip.write_file(image_buffer)
         zip.close_file()
 
-    zip.close()   # unconditional now — was the bug
+    zip.close()
+    set_unsaved_changes(false)
     return OK
 
 func _download_project_zip() -> void:
@@ -186,6 +190,7 @@ func _download_project_zip() -> void:
     DirAccess.remove_absolute(tmp_path)
 
     JavaScriptBridge.download_buffer(bytes, "map.zip", "application/zip")
+    set_unsaved_changes(false)
 
 func write_file(path: String, contents: String):
     var file := FileAccess.open(path, FileAccess.WRITE)
@@ -377,4 +382,28 @@ func _on_web_png_uploaded(args: Array) -> void:
         return
 
     map.set_map(image, file_name, 10)
+
+func _setup_beforeunload() -> void:
+    JavaScriptBridge.eval("""
+        window.godotBeforeUnload = function(event) {
+            if (window.godotHasUnsavedChanges) {
+                event.preventDefault();
+                event.returnValue = '';
+                return '';
+            }
+        };
+
+        window.addEventListener(
+            'beforeunload',
+            window.godotBeforeUnload
+        );
+    """, true)
     
+func set_unsaved_changes(value: bool) -> void:
+    has_unsaved_changes = value
+
+    if OS.get_name() == "Web":
+        JavaScriptBridge.eval(
+            "window.godotHasUnsavedChanges = " + str(value).to_lower() + ";",
+            true
+        )

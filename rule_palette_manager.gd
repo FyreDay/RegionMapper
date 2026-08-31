@@ -1,6 +1,8 @@
 class_name RulePaletteManager
 extends VBoxContainer
 
+signal hasdata
+
 var dragable_rule = preload("res://rules/Dragable_Rule.tscn")
 @onready var new_rule_combo_button: Button = $New
 
@@ -52,6 +54,7 @@ func delete_custom_rule(dragable_combo:DragableRuleNameEdit):
     dragable_combo.queue_free()
 
 func _on_new_pressed() -> void:
+    hasdata.emit()
     var rule_combo = RuleCombo.new()
     rule_combo.combo_name = "Rule " + str(get_child_count())
     create_new_combo(rule_combo)

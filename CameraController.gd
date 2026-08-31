@@ -17,8 +17,11 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
     Zoom(delta)
-    SimplePan(delta)
+    var focused_node = get_viewport().gui_get_focus_owner()
+    if focused_node and not focused_node.is_class("CustomeEdit"):
+        SimplePan(delta)
     ClickAndDrag()
+
 
 func Zoom(delta):
     if not input_enabled:
@@ -30,10 +33,12 @@ func Zoom(delta):
         zoomTarget /= 1.1
         zoomMult *= 1.1
     zoom = zoom.slerp(zoomTarget, 10 * delta)
-    
+
+var old 
 func SimplePan(delta):
     if not input_enabled:
         return
+
     var moveAmount = Vector2.ZERO
     if Input.is_action_pressed("camera_move_right"):
         moveAmount.x += 1

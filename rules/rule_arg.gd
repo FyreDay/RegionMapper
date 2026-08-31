@@ -9,7 +9,7 @@ extends HBoxContainer
 @onready var string_list: HBoxContainer = $StringListValue
 @onready var add_string_list: Button = $StringListValue/Add
 
-var string_input = preload("res://rules/menus/string_input.tscn")
+var string_input = preload("res://custom/input.tscn")
 
 var arg_name
 var rule_data: RuleData

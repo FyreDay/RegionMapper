@@ -2,6 +2,7 @@ class_name GroupEditor
 extends Control
 
 signal changed(Array)
+signal hasdata
 
 @onready var container: VBoxContainer = $ScrollContainer/EntranceGroupContainer
 @onready var enter: HBoxContainer = $ScrollContainer/EntranceGroupContainer/HBoxContainer
@@ -10,6 +11,7 @@ signal changed(Array)
 var entrance_group = preload("res://entrance_group_type.tscn")
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
+    hasdata.emit()
     create_new_flag(new_text)
     create_new_Array()
 

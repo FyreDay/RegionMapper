@@ -12,6 +12,7 @@ signal rule_builder_toggled(bool)
 signal request_web_import
 signal request_web_map_import
 signal flags_updated
+signal data_changed
 
 signal region_scale_changed(float)
 
@@ -41,6 +42,10 @@ signal region_scale_changed(float)
 
 @onready var group_editor: GroupEditor = $EntranceGroupPopupPanel/EntranceGroupEditor
 
+@onready var load_button: Button = $CanvasLayer/Panel/HBoxContainer/LoadButton
+@onready var load_onto_button: Button = $CanvasLayer/Panel/HBoxContainer/LoadOntoButton
+
+
 var dragable = preload("res://rules/Dragable_Rule.tscn")
 
 var palette_open = false
@@ -49,8 +54,13 @@ var selected_dragable_rule_combo:DragableRuleNameEdit
 
 func _ready() -> void:
     root_rule_spot.hide()
+    load_button.show()
+    load_onto_button.hide()
     root_rule_label.text = "Select a rule from the palette"
     group_editor.changed.connect(flags_updated.emit)
+    group_editor.hasdata.connect(change_to_override)
+    custom_rule_creator.hasdata.connect(change_to_override)
+    rule_palette_manager.hasdata.connect(change_to_override)
 
 func _process(delta: float) -> void:
     slide_panel(delta)
@@ -164,10 +174,23 @@ func _on_control_hint_pressed() -> void:
 
 func _on_open_flags_button_pressed() -> void:
     entrance_group_panel.popup()
+    popup_opened.emit()
 
 
 func _on_entrance_group_popup_panel_popup_hide() -> void:
-    pass
+    popup_closed.emit()
     
 func _on_flags_updated(arr:Array):
     group_editor.load_array(arr)
+
+
+func _on_load_onto_button_pressed() -> void:
+    if OS.get_name() == "Web":
+        request_web_import.emit()
+    else:
+        save_file_load_dialog.popup_file_dialog()
+    
+func change_to_override():
+    data_changed.emit()
+    load_button.hide()
+    load_onto_button.show()

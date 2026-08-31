@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://do56cyjkrti06"]
 
 [ext_resource type="Script" uid="uid://b60yy8ienyqwb" path="res://rules/menus/rule_arg_type.gd" id="1_hgt43"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_l1g45"]
 
 [node name="RuleArgType" type="HBoxContainer" unique_id=1051691005]
 anchors_preset = 15
@@ -17,18 +18,15 @@ layout_mode = 2
 layout_mode = 2
 text = "Name"
 
-[node name="ArgName" type="LineEdit" parent="." unique_id=224746862]
+[node name="ArgName" parent="." unique_id=573753716 instance=ExtResource("2_l1g45")]
 layout_mode = 2
-expand_to_text_length = true
 
 [node name="Label2" type="Label" parent="." unique_id=295698084]
 layout_mode = 2
 text = "Default"
 
-[node name="StringValue" type="LineEdit" parent="." unique_id=60366090]
+[node name="StringValue" parent="." unique_id=1153267565 instance=ExtResource("2_l1g45")]
 layout_mode = 2
-expand_to_text_length = true
-emoji_menu_enabled = false
 
 [node name="IntValue" type="SpinBox" parent="." unique_id=351381851]
 layout_mode = 2

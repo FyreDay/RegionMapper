@@ -6,6 +6,7 @@ signal hovered_region_update
 signal hovered_entrance_update
 signal save_data_ready
 signal load_flag_names
+signal hasdata
 
 var region_scene = preload("res://region.tscn")
 var entrance_scene = preload("res://entrance.tscn")
@@ -160,6 +161,7 @@ func draw_region(_delta):
         queue_redraw()
         
 func create_region(rect: Rect2):
+    hasdata.emit()
     var region = region_scene.instantiate()
     
     var name_base = 'Region'
@@ -214,6 +216,7 @@ func draw_entrance(_delta):
         queue_redraw()
         
 func create_entrance(from_region, to_region, from_pos, to_pos, dual_directional):
+    hasdata.emit()
     var entrance = entrance_scene.instantiate()
     var name_base = from_region.region_name + " To " + to_region.region_name
     var new_name = name_base
@@ -488,6 +491,7 @@ func save_data():
     return data
 
 func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
+    hasdata.emit()
     var region_lookup := {}
     var regions = []
     var entrances = []

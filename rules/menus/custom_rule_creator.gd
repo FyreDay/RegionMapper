@@ -1,6 +1,8 @@
 class_name CustomRuleCreator
 extends Control
 
+signal hasdata
+
 var arg_type = preload("res://rules/menus/rule_arg_type.tscn")
 var rule_data = preload("res://rules/dragable_custom_rule.tscn")
 
@@ -26,6 +28,7 @@ func _on_delete_arg_pressed() -> void:
 
 
 func _on_save_pressed() -> void:
+    hasdata.emit()
     var dcr = rule_data.instantiate()
     rule_manager.add_custom_dragable(dcr)
     dcr.setup(custom_rule, drag_layer)

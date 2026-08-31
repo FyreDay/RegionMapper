@@ -313,7 +313,12 @@ func _on_color_changer_popup_closed() -> void:
 func _on_color_changer_picker_created() -> void:
     old_region_color = region_color
 
+func string_to_id(text: String) -> String:
+    # Replace spaces and hyphens with underscores
+    var sanitized = text.strip_edges().replace(" ", "_").replace("-", "_").replace("'", "")
+    # Convert the entire string to uppercase
+    return sanitized.to_upper()
 
 func _on_copy_name_button_pressed() -> void:
-    DisplayServer.clipboard_set(region_name)
+    DisplayServer.clipboard_set("Regions." + string_to_id(region_name))
     

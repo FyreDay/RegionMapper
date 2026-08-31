@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bn0m5gyt46tmg"]
 
 [ext_resource type="Script" uid="uid://cvxux8r3iuo8y" path="res://rules/Dragable_Rule.gd" id="1_qckad"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_dnarh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qckad"]
 bg_color = Color(0.62675035, 0, 0.14012492, 1)
@@ -35,10 +36,8 @@ offset_bottom = 110.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="NameEdit" type="LineEdit" parent="EditMenu/VBoxContainer" unique_id=297068134]
+[node name="NameEdit" parent="EditMenu/VBoxContainer" unique_id=573753716 instance=ExtResource("2_dnarh")]
 layout_mode = 2
-expand_to_text_length = true
-emoji_menu_enabled = false
 
 [node name="DeleteButton" type="Button" parent="EditMenu/VBoxContainer" unique_id=1243256787]
 layout_mode = 2

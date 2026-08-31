@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://11k3d6njt6so"]
 
 [ext_resource type="Script" uid="uid://dqswyfyclawkr" path="res://rules/rule_arg.gd" id="1_tyiea"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_6hoiq"]
 
 [node name="RuleArg" type="HBoxContainer" unique_id=388887729]
 anchors_preset = 15
@@ -13,11 +14,8 @@ script = ExtResource("1_tyiea")
 [node name="Label" type="Label" parent="." unique_id=1663246631]
 layout_mode = 2
 
-[node name="StringValue" type="LineEdit" parent="." unique_id=28478435]
+[node name="StringValue" parent="." unique_id=573753716 instance=ExtResource("2_6hoiq")]
 layout_mode = 2
-expand_to_text_length = true
-emoji_menu_enabled = false
-drag_and_drop_selection_enabled = false
 
 [node name="IntValue" type="SpinBox" parent="." unique_id=1897634937]
 layout_mode = 2

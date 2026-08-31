@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://2dwbpea04jja"]
 
 [ext_resource type="Script" uid="uid://cywy157k8ha7m" path="res://entrance.gd" id="1_4bqal"]
+[ext_resource type="PackedScene" uid="uid://ch28l1krfw0fb" path="res://custom/input.tscn" id="2_051eu"]
 [ext_resource type="Texture2D" uid="uid://ddvx6cvva1wqb" path="res://assets/delete.png" id="3_051eu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4bqal"]
@@ -15,14 +16,12 @@ script = ExtResource("1_4bqal")
 offset_left = 4.0
 offset_top = 4.0
 offset_right = 155.0
-offset_bottom = 180.0
+offset_bottom = 246.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="NameEdit" type="LineEdit" parent="EditMenu/VBoxContainer" unique_id=679271565]
+[node name="NameEdit" parent="EditMenu/VBoxContainer" unique_id=573753716 instance=ExtResource("2_051eu")]
 layout_mode = 2
-expand_to_text_length = true
-emoji_menu_enabled = false
 
 [node name="IsTwoWay" type="CheckBox" parent="EditMenu/VBoxContainer" unique_id=761565201]
 layout_mode = 2

@@ -69,7 +69,7 @@ func _on_web_paste(args: Array) -> void:
     if args.is_empty():
         return
 
-    var text := str(args[0])
+    var test_text := str(args[0])
 
     var focused := get_viewport().gui_get_focus_owner()
     print("[paste] focused node: ", focused)
@@ -79,6 +79,6 @@ func _on_web_paste(args: Array) -> void:
         return
 
     # Insert directly rather than trying to invoke LineEdit's native paste.
-    insert_text_at_caret(text)
+    insert_text_at_caret(test_text)
 
     print("[paste] inserted into LineEdit")

@@ -14,7 +14,9 @@ func _gui_input(event: InputEvent) -> void:
         if event.pressed and not event.echo:
             if event.keycode == KEY_V and (event.ctrl_pressed or event.meta_pressed):
                 print("Godot Ctrl+V pressed")
-                get_viewport().set_input_as_handled()
+
+                # Don't mark this as handled.
+                # Let the browser perform its normal paste operation.
 
 
 func _setup_web_paste_bridge() -> void:
@@ -31,34 +33,21 @@ func _setup_web_paste_bridge() -> void:
 
             window.godotPasteListenerInstalled = true;
 
-            window.addEventListener('keydown', function(e) {
-                if ((e.ctrlKey || e.metaKey) &&
-                    (e.key === 'v' || e.key === 'V')) {
+            // Capture the actual browser paste event.
+            window.addEventListener('paste', function(e) {
+                console.log('[paste] browser paste event fired');
 
-                    console.log('[paste] JS Ctrl+V detected');
+                var text = e.clipboardData.getData('text/plain');
 
-                    if (!navigator.clipboard) {
-                        console.log('[paste] navigator.clipboard unavailable');
-                        return;
-                    }
+                console.log('[paste] paste event text:', JSON.stringify(text));
 
-                    navigator.clipboard.readText()
-                        .then(function(text) {
-                            console.log('[paste] clipboard text:', JSON.stringify(text));
-
-                            if (window.godotPasteCallback) {
-                                window.godotPasteCallback(text);
-                            } else {
-                                console.log('[paste] godotPasteCallback missing!');
-                            }
-                        })
-                        .catch(function(err) {
-                            console.error('[paste] clipboard.readText() failed:', err);
-                        });
+                if (window.godotPasteCallback) {
+                    window.godotPasteCallback(text);
+                    e.preventDefault();
                 }
-            });
+            }, true); // Capture phase is important.
 
-            console.log('[paste] JS keydown listener registered');
+            console.log('[paste] JS paste listener registered');
         })();
     """, true)
 
@@ -69,16 +58,10 @@ func _on_web_paste(args: Array) -> void:
     if args.is_empty():
         return
 
-    var test_text := str(args[0])
+    var text := str(args[0])
 
-    var focused := get_viewport().gui_get_focus_owner()
-    print("[paste] focused node: ", focused)
-
-    if focused != self:
-        print("[paste] LineEdit is not focused")
+    if not has_focus():
         return
 
-    # Insert directly rather than trying to invoke LineEdit's native paste.
-    insert_text_at_caret(test_text)
-
+    insert_text_at_caret(text)
     print("[paste] inserted into LineEdit")

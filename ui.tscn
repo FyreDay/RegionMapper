@@ -240,7 +240,7 @@ text = "Load Data"
 
 [node name="LoadOntoButton" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=29288176]
 layout_mode = 2
-text = "Load Override Data"
+text = "Load Override Data (Unfinished)"
 
 [node name="ExportButton" type="Button" parent="CanvasLayer/Panel/HBoxContainer" unique_id=817138769]
 layout_mode = 2

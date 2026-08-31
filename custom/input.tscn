@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://ch28l1krfw0fb"]
+
+[ext_resource type="Script" uid="uid://bvjvxaqqbiiua" path="res://custom/input.gd" id="1_02y6m"]
+
+[node name="Input" type="LineEdit" unique_id=573753716]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+context_menu_enabled = false
+emoji_menu_enabled = false
+script = ExtResource("1_02y6m")

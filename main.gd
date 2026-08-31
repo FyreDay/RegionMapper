@@ -55,6 +55,7 @@ func _input(event: InputEvent) -> void:
     
     if OS.get_name() == "Web" and event is InputEventKey and event.pressed and not event.echo:
         if event.keycode == KEY_V and (event.ctrl_pressed or event.meta_pressed):
+            print("Ctrl v pressed")
             if get_viewport().gui_get_focus_owner() is LineEdit:
                 print("Found Line Edit")
                 get_viewport().set_input_as_handled()

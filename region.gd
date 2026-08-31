@@ -15,7 +15,7 @@ signal resize_moved(region, old_rect, new_rect)
 signal resize_ended
 
 @onready var edit_menu: PopupPanel = $EditMenu
-@onready var name_edit: LineEdit = $EditMenu/VBoxContainer/NameEdit
+@onready var name_edit: CustomEdit = $EditMenu/VBoxContainer/NameEdit
 @onready var color_changer: ColorPickerButton = $EditMenu/VBoxContainer/ColorChanger
 enum Dragables { TOP_BAR, RESIZE_HANDLE, NONE}
 const alpha = .3

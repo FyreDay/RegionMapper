@@ -1,13 +1,23 @@
 class_name CustomEdit
 extends LineEdit
 
-var _web_paste_callback: JavaScriptObject
+static var focused_edit: CustomEdit
+var _web_paste_callback
 
 
 func _ready() -> void:
+    focus_entered.connect(_on_focus_entered)
+
     if OS.get_name() == "Web":
         _setup_web_paste_bridge()
 
+func _exit_tree() -> void:
+    if focused_edit == self:
+        focused_edit = null
+
+
+func _on_focus_entered() -> void:
+    focused_edit = self
 
 func _gui_input(event: InputEvent) -> void:
     if OS.get_name() == "Web" and event is InputEventKey:
@@ -16,7 +26,7 @@ func _gui_input(event: InputEvent) -> void:
                 print("Godot Ctrl+V pressed")
 
                 # Don't mark this as handled.
-                # Let the browser perform its normal paste operation.
+                get_viewport().set_input_as_handled()
 
 
 func _setup_web_paste_bridge() -> void:
@@ -26,42 +36,39 @@ func _setup_web_paste_bridge() -> void:
     window.godotPasteCallback = _web_paste_callback
 
     JavaScriptBridge.eval("""
-        (function() {
-            if (window.godotPasteListenerInstalled) {
-                return;
+    (function() {
+        if (window.godotPasteListenerInstalled) {
+            return;
+        }
+
+        window.godotPasteListenerInstalled = true;
+
+        document.addEventListener('paste', function(e) {
+            console.log('[paste] browser paste detected');
+
+            var text = e.clipboardData.getData('text/plain');
+            console.log('[paste] clipboard text:', JSON.stringify(text));
+
+            if (window.godotPasteCallback) {
+                e.preventDefault();
+                window.godotPasteCallback(text);
             }
+        }, true); // <-- capture phase
 
-            window.godotPasteListenerInstalled = true;
-
-            // Capture the actual browser paste event.
-            window.addEventListener('paste', function(e) {
-                console.log('[paste] browser paste event fired');
-
-                var text = e.clipboardData.getData('text/plain');
-
-                console.log('[paste] paste event text:', JSON.stringify(text));
-
-                if (window.godotPasteCallback) {
-                    window.godotPasteCallback(text);
-                    e.preventDefault();
-                }
-            }, true); // Capture phase is important.
-
-            console.log('[paste] JS paste listener registered');
-        })();
+        console.log('[paste] capture listener registered');
+    })();
     """, true)
-
 
 func _on_web_paste(args: Array) -> void:
     print("[paste] Godot callback: ", args)
-
     if args.is_empty():
         return
 
-    var text := str(args[0])
-
-    if not has_focus():
+    if get_viewport().gui_get_focus_owner() != self:
         return
 
-    insert_text_at_caret(text)
+    var pasted_text := str(args[0])
+    insert_text_at_caret(pasted_text)
     print("[paste] inserted into LineEdit")
+
+    

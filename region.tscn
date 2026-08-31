@@ -14,8 +14,8 @@ script = ExtResource("1_rtl5y")
 [node name="VBoxContainer" type="VBoxContainer" parent="EditMenu" unique_id=469638264]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 96.0
-offset_bottom = 96.0
+offset_right = 116.0
+offset_bottom = 167.0
 size_flags_vertical = 3
 
 [node name="CopyNameButton" type="Button" parent="EditMenu/VBoxContainer" unique_id=69918670]

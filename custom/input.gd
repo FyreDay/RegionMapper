@@ -3,10 +3,10 @@ extends LineEdit
 
 var _web_paste_callback: JavaScriptObject
 
-
-func _ready() -> void:
-    if OS.get_name() == "Web":
-        _setup_web_paste_bridge()
+#
+#func _ready() -> void:
+    #if OS.get_name() == "Web":
+        #_setup_web_paste_bridge()
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "pre-v*"
+
 
 permissions:
   contents: read
@@ -22,8 +25,11 @@ jobs:
       image: barichello/godot-ci:4.6.3
 
     steps:
-      - name: Checkout
+      - name: Checkout Main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
 
       - name: Setup Godot
         run: |
@@ -37,10 +43,25 @@ jobs:
           find / -iname "web_nothreads*" 2>/dev/null
           find / -iname "web_*.zip" 2>/dev/null
 
-      - name: Export Web
+      - name: Export Main
+        working-directory: main
         run: |
           mkdir -p build
           godot --headless --export-release "Web" build/index.html
+
+      - name: Checkout tag
+        if: startsWith(github.ref, 'refs/tags/pre-v')
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          path: tag
+        
+      - name: Export tag to /test
+        if: startsWith(github.ref, 'refs/tags/pre-v')
+        working-directory: tag
+        run: |
+          mkdir -p ../build/test
+          godot --headless --export-release "Web" ../build/test/index.html
 
       - name: Cache bust Godot assets
         run: |
@@ -51,6 +72,17 @@ jobs:
             -e "s|\.pck|.pck?v=$VERSION|g" \
             -e "s|\.js|.js?v=$VERSION|g" \
             build/index.html
+
+          if [ -f build/test/index.html ]; then
+            TAG_VERSION="${{ github.ref_name }}"
+
+            sed -i \
+              -e "s|\.wasm|.wasm?v=$TAG_VERSION|g" \
+              -e "s|\.pck|.pck?v=$TAG_VERSION|g" \
+              -e "s|\.js|.js?v=$TAG_VERSION|g" \
+              build/test/index.html
+          fi
+          
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

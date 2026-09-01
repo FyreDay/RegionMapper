@@ -3,58 +3,52 @@ extends Node
 func _ready() -> void:
     if OS.has_feature("web"):
         print("setup listener")
-        _setup_web_paste_listener()
+        _setup_web_paste_bridge()
 
 
-func _setup_web_paste_listener() -> void:
-    print("Setting up web paste listener")
-
-    var js = """
+func _setup_web_paste_bridge() -> void:
+    JavaScriptBridge.eval("""
 		window.godotWebPasteBuffer = null;
 
-		window.addEventListener("paste", function(event) {
-			console.log("Browser paste event fired");
+		window.addEventListener("keydown", function(event) {
+			if ((event.ctrlKey || event.metaKey) &&
+				event.key.toLowerCase() === "v") {
 
-			const clipboardData = event.clipboardData;
-			if (!clipboardData) {
-				console.log("No clipboardData");
-				return;
+				console.log("Browser Ctrl+V");
+
+				const input = document.createElement("textarea");
+
+				input.style.position = "fixed";
+				input.style.left = "-10000px";
+				input.style.top = "0";
+				input.style.opacity = "0";
+
+				document.body.appendChild(input);
+				input.focus();
+
+				input.addEventListener("paste", function(pasteEvent) {
+					console.log("Browser paste received");
+
+					window.godotWebPasteBuffer =
+						pasteEvent.clipboardData.getData("text/plain");
+
+					pasteEvent.preventDefault();
+
+					input.remove();
+				});
 			}
-
-			const text = clipboardData.getData("text/plain");
-
-			console.log("Browser clipboard:", text);
-
-			window.godotWebPasteBuffer = text;
-
-			event.preventDefault();
 		}, true);
-	"""
-
-    JavaScriptBridge.eval(js)
+    """)
 
 
 func _process(_delta: float) -> void:
-    if OS.has_feature("web"):
-        _poll_web_paste()
+    if not OS.has_feature("web"):
+        return
 
-
-func _poll_web_paste() -> void:
-    var text = JavaScriptBridge.eval("""
-		(function() {
-			if (window.godotWebPasteBuffer === null) {
-				return null;
-			}
-            
-			const value = window.godotWebPasteBuffer;
-            console.log(value)
-			window.godotWebPasteBuffer = null;
-			return value;
-		})()
-    """)
-
+    var text = JavaScriptBridge.eval("window.godotWebPasteBuffer")
+    print(text)
     if text != null:
-        print("Received browser clipboard: ", text)
+        JavaScriptBridge.eval("window.godotWebPasteBuffer = null;")
         _inject_text_into_focused_node(text)
 
 

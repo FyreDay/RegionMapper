@@ -15,7 +15,7 @@ func _setup_web_paste_bridge() -> void:
 				event.key.toLowerCase() === "v") {
 
 				console.log("Browser Ctrl+V");
-
+                stopImmediatePropagation()
 				const input = document.createElement("textarea");
 
 				input.style.position = "fixed";
@@ -31,8 +31,6 @@ func _setup_web_paste_bridge() -> void:
 
 					window.godotWebPasteBuffer =
 						pasteEvent.clipboardData.getData("text/plain");
-
-					pasteEvent.preventDefault();
 
 					input.remove();
 				});

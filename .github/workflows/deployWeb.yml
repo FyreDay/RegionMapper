@@ -37,17 +37,11 @@ jobs:
           ln -s /root/.local ~/.local
           ln -s /root/.config/godot ~/.config/godot
 
-      - name: Verify templates
-        run: |
-          echo "HOME=$HOME"
-          find / -iname "web_nothreads*" 2>/dev/null
-          find / -iname "web_*.zip" 2>/dev/null
-
       - name: Export Main
         working-directory: main
         run: |
-          mkdir -p build
-          godot --headless --export-release "Web" build/index.html
+          mkdir -p $GITHUB_WORKSPACE/build
+          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/index.html
 
       - name: Checkout tag
         if: startsWith(github.ref, 'refs/tags/pre-v')
@@ -60,8 +54,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/pre-v')
         working-directory: tag
         run: |
-          mkdir -p ../build/test
-          godot --headless --export-release "Web" ../build/test/index.html
+          mkdir -p $GITHUB_WORKSPACE/build/test
+          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/test/index.html
 
       - name: Cache bust Godot assets
         run: |
@@ -71,22 +65,22 @@ jobs:
             -e "s|\.wasm|.wasm?v=$VERSION|g" \
             -e "s|\.pck|.pck?v=$VERSION|g" \
             -e "s|\.js|.js?v=$VERSION|g" \
-            build/index.html
+            $GITHUB_WORKSPACE/build/index.html
 
-          if [ -f build/test/index.html ]; then
+          if [ -f $GITHUB_WORKSPACE/build/test/index.html ]; then
             TAG_VERSION="${{ github.ref_name }}"
 
             sed -i \
               -e "s|\.wasm|.wasm?v=$TAG_VERSION|g" \
               -e "s|\.pck|.pck?v=$TAG_VERSION|g" \
               -e "s|\.js|.js?v=$TAG_VERSION|g" \
-              build/test/index.html
+              $GITHUB_WORKSPACE/build/test/index.html
           fi
-          
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: $GITHUB_WORKSPACE/build
 
   deploy:
     runs-on: ubuntu-24.04

@@ -246,7 +246,7 @@ func generate_regions_python(data) -> String:
 
 const ENTRANCES_HEADER := """\
 from enum import Enum, IntFlag
-from .regions import Regions
+from .regions import Regions, RegionTypeEnum
 from rule_builder.rules import True_
 from BaseClasses import EntranceType
 
@@ -284,7 +284,11 @@ func generate_entrances_python(data, flag_names) -> String:
     for index in flag_names.size():
         output += ('    ' + string_to_id(flag_names[index]) + ' = 1 << ' + str(index) + '\n')
     output+='\n'
-        
+    
+    output += '\n'
+    output += ENTRANCES_TYPE_ENUM
+    output += '\n'
+    
     output += "class Entrances(EntranceTypeEnum):\n"
     for entrance in data:
 

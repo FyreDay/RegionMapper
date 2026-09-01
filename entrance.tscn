@@ -68,7 +68,10 @@ text = "Delete"
 offset_right = 68.5
 offset_bottom = 31.0
 theme_override_colors/font_uneditable_color = Color(1, 1, 0.98039216, 0.5019608)
+editable = false
 expand_to_text_length = true
+context_menu_enabled = false
+emoji_menu_enabled = false
 selecting_enabled = false
 
 [connection signal="popup_hide" from="EditMenu" to="." method="_on_edit_menu_popup_hide"]

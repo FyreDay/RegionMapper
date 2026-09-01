@@ -14,7 +14,6 @@ func _gui_input(event: InputEvent) -> void:
         if event.pressed and not event.echo:
             if event.keycode == KEY_V and (event.ctrl_pressed or event.meta_pressed):
                 print("Godot Ctrl+V STOPPED")
-                JavaScriptBridge.eval("window.godotPaste();")
                 get_viewport().set_input_as_handled()
 
 

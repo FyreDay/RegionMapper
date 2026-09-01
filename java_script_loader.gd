@@ -3,6 +3,7 @@ extends Node
 func _ready() -> void:
     # Only execute this logic if the application is running in a web export
     if OS.has_feature("web"):
+        print("Setup javascript copy/paste bridge")
         _setup_web_paste_listener()
 
 func _setup_web_paste_listener() -> void:
@@ -15,7 +16,7 @@ func _setup_web_paste_listener() -> void:
 		// Securely extract plain text straight from the browser event
 		let clipboardData = event.clipboardData || window.clipboardData;
 		let pastedText = clipboardData.getData('text');
-		
+		console.log("Listen to event")
 		// Buffer the content into our accessible window variable
 		window.godotWebPasteBuffer = pastedText;
 	});

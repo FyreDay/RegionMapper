@@ -41,56 +41,42 @@ jobs:
           echo "===== GODOT VERSION ====="
           godot --version
           echo
-          echo "===== ENVIRONMENT ====="
-          echo "HOME=$HOME"
-          echo "USER=$(whoami)"
-          echo "GODOT=$(which godot)"
+          echo "===== GODOT LOCATION ====="
+          which godot
 
       - name: Download custom Godot Web template
         run: |
-          VERSION=$(godot --version | head -n1 | awk '{print $1}')
+          TEMPLATE_VERSION="4.6.3.stable"
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
 
-          echo "Installing custom template for Godot $VERSION"
+          echo "Installing custom Web template:"
+          echo "  $TEMPLATE_DIR/web_release.zip"
 
-          mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
+          mkdir -p "$TEMPLATE_DIR"
 
-          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
+          wget -O "$TEMPLATE_DIR/web_release.zip" \
             https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_release.zip
+
+          echo
+          echo "===== INSTALLED CUSTOM TEMPLATE ====="
+          ls -lh "$TEMPLATE_DIR/web_release.zip"
 
       - name: Verify templates
         run: |
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.6.3.stable"
+
           echo "===== GODOT TEMPLATE DIRECTORY ====="
-
-          VERSION=$(godot --version | head -n1 | awk '{print $1}')
-
-          echo "Expected version: $VERSION"
-          echo
-
-          find "$HOME/.local/share/godot/export_templates" \
-            -maxdepth 3 \
-            -type f \
-            -print 2>/dev/null || true
+          find "$TEMPLATE_DIR" -maxdepth 1 -type f -printf "%f %s bytes\n" | sort
 
           echo
-          echo "===== ALL WEB TEMPLATES ====="
-
-          find /root /github /home \
-            -iname "web_*.zip" \
-            -o -iname "web_nothreads*" \
-            2>/dev/null || true
+          echo "===== WEB TEMPLATES ====="
+          find "$TEMPLATE_DIR" -maxdepth 1 \
+            \( -iname "web_*.zip" -o -iname "web_nothreads*" \) \
+            -printf "%f %s bytes\n" | sort
 
           echo
-          echo "===== CUSTOM TEMPLATE ====="
-
-          ls -lh \
-            "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip"
-
-          echo
-          echo "===== CUSTOM TEMPLATE CONTENTS ====="
-
-          unzip -l \
-            "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
-            | head -50
+          echo "===== CUSTOM WEB_RELEASE.ZIP CONTENTS ====="
+          unzip -l "$TEMPLATE_DIR/web_release.zip"
 
       - name: Export Main
         working-directory: main

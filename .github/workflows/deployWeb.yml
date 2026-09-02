@@ -50,16 +50,16 @@ jobs:
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
 
           echo "Installing custom Web template:"
-          echo "  $TEMPLATE_DIR/web_release.zip"
+          echo "  $TEMPLATE_DIR/web_nothreads_release.zip"
 
           mkdir -p "$TEMPLATE_DIR"
 
-          wget -O "$TEMPLATE_DIR/web_release.zip" \
-            https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_release.zip
+          wget -O "$TEMPLATE_DIR/web_nothreads_release.zip" \
+            https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_nothreads_release.zip
 
           echo
           echo "===== INSTALLED CUSTOM TEMPLATE ====="
-          ls -lh "$TEMPLATE_DIR/web_release.zip"
+          ls -lh "$TEMPLATE_DIR/web_nothreads_release.zip"
 
       - name: Verify templates
         run: |
@@ -75,8 +75,8 @@ jobs:
             -printf "%f %s bytes\n" | sort
 
           echo
-          echo "===== CUSTOM WEB_RELEASE.ZIP CONTENTS ====="
-          unzip -l "$TEMPLATE_DIR/web_release.zip"
+          echo "===== CUSTOM WEB_NOTHREADS_RELEASE.ZIP CONTENTS ====="
+          unzip -l "$TEMPLATE_DIR/web_nothreads_release.zip"
 
       - name: Export Main
         working-directory: main

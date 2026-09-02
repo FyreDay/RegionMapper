@@ -175,15 +175,21 @@ func is_mouse_over(global_mouse_pos: Vector2) -> bool:
     return node_rect.has_point(to_local(global_mouse_pos))
 
 func is_mouse_over_merge(global_mouse_pos: Vector2) -> bool:
-    if is_merge_controller:
-        if is_mouse_over(global_mouse_pos):
-            return true
-        for region in region_references:
-            if region.is_mouse_over(global_mouse_pos):
-                return true
-    else:
-        return merge_controller.is_mouse_over_merge(global_mouse_pos)
+    
+    var controller = self
+
+    if not is_merge_controller:
+        controller = merge_controller
+    
+    if controller == null:
+        return is_mouse_over(global_mouse_pos)
+    
+    if controller.is_mouse_over(global_mouse_pos):
+        return true
         
+    for region in controller.region_references:
+        if region.is_mouse_over(global_mouse_pos):
+            return true
     return false
 
 func get_controller():

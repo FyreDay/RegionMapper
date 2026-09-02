@@ -432,18 +432,31 @@ func save_data():
     var region_ids := {}
 
     for child in get_children():
-        if child is Region:
+        if child is Region and child.is_merge_controller:
             region_ids[child] = string_to_id(child.region_name)
+            for index in child.region_references.size():
+                region_ids[child.region_references[index]] = string_to_id(child.region_name) + str(index) + "_TEMP_REGION_CHILD"
+
             
     for child in get_children():
         if child is Region:
             var merge_id = null
-
+            var region_name = child.region_name
+            var region_color = [
+                    child.region_color.r,
+                    child.region_color.g,
+                    child.region_color.b,
+                    child.region_color.a
+                ]
+            var region_id = region_ids[child]
+            
             if not child.is_merge_controller:
                 merge_id = region_ids[child.merge_controller]
-
+                #region_name = null
+                #region_color = null
+                #
             data.regions.append({
-                "id": region_ids[child],
+                "id": region_id,
                 "position": [
                     child.node_rect.position.x,
                     child.node_rect.position.y
@@ -452,13 +465,8 @@ func save_data():
                     child.node_rect.size.x,
                     child.node_rect.size.y
                 ],
-                "name": child.region_name,
-                "color": [
-                    child.region_color.r,
-                    child.region_color.g,
-                    child.region_color.b,
-                    child.region_color.a
-                ],
+                "name": region_name,
+                "color": region_color,
                 "merge_controller": merge_id
             })
     for child in get_children():
@@ -485,7 +493,8 @@ func save_data():
                 "flags": child.flags,
                 "name": child.entrance_name,
                 "rule_name": rule_name,
-                "dual_directional": child.duel_directonal
+                "dual_directional": child.duel_directonal,
+                "minimal_nameplate": child.minimal_nameplate
             })
     save_data_ready.emit(data)
     return data
@@ -521,6 +530,7 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
         )
         
         connect_region_signals(region)
+
         region_lookup[region_data.id] = region
         
         regions.append(region)
@@ -531,19 +541,25 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
         var region = region_lookup[region_data.id]
 
         var controller_id = region_data.merge_controller
-
+        
         if controller_id != null:
             var controller = region_lookup[controller_id]
+            
+            if controller == null:
+                push_error("Could not find merge controller: " + str(controller_id))
+                region.is_merge_controller = true
+                region.merge_controller = null
+            else:
+                region.merge_controller = controller
+                region.is_merge_controller = false
+                region.region_name = controller.region_name
+                region.region_color = controller.region_color
 
-            region.merge_controller = controller
-            region.is_merge_controller = false
-            region.region_name = controller.region_name
-            region.region_color = controller.region_color
-
-            if not controller.region_references.has(region):
-                controller.region_references.append(region)
+                if not controller.region_references.has(region):
+                    controller.region_references.append(region)
         else:
             region.is_merge_controller = true
+            region.merge_controller = null
         region.queue_redraw()
         
     #setup entrances
@@ -567,7 +583,9 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
                 entrance_data.plate_pos[0],
                 entrance_data.plate_pos[1]
             )
-
+        
+        var minimal_nameplate = entrance_data.get("minimal_nameplate", false)
+        
         var entrance = entrance_scene.instantiate()
         add_child(entrance)
         entrance.setup(
@@ -577,7 +595,8 @@ func load_data(data: Dictionary, rule_combo_manager:RulePaletteManager):
             to_pos,
             entrance_data.dual_directional,
             entrance_data.name,
-            flags
+            flags,
+            minimal_nameplate
         )
         if plate_pos:
             entrance.set_endpoint(Entrance.endpoints.NAME_BOX, plate_pos)

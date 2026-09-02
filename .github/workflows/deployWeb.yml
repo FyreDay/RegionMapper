@@ -41,20 +41,17 @@ jobs:
         run: |
           godot --version
 
-      - name: Install custom Godot Web template
+      - name: Download custom Godot Web template
         run: |
           VERSION=$(godot --version | head -n1 | awk '{print $1}')
-          echo "Godot version: $VERSION"
-
           mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
 
-          curl -fL \
-            -o "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
+          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
             https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_release.zip
 
           echo "Installed template:"
           ls -lh "$HOME/.local/share/godot/export_templates/$VERSION/"
-          
+
       - name: Export Main
         working-directory: main
         run: |

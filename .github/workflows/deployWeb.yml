@@ -44,22 +44,22 @@ jobs:
           echo "===== GODOT LOCATION ====="
           which godot
 
-      - name: Download custom Godot Web template
+            - name: Install custom single-threaded Web template
         run: |
           TEMPLATE_VERSION="4.6.3.stable"
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
-
-          echo "Installing custom Web template:"
-          echo "  $TEMPLATE_DIR/web_nothreads_release.zip"
 
           mkdir -p "$TEMPLATE_DIR"
 
           wget -O "$TEMPLATE_DIR/web_nothreads_release.zip" \
             https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_nothreads_release.zip
 
-          echo
-          echo "===== INSTALLED CUSTOM TEMPLATE ====="
+          echo "===== CUSTOM TEMPLATE ====="
           ls -lh "$TEMPLATE_DIR/web_nothreads_release.zip"
+
+          echo
+          echo "===== CUSTOM TEMPLATE CONTENTS ====="
+          unzip -l "$TEMPLATE_DIR/web_nothreads_release.zip"
 
       - name: Verify templates
         run: |

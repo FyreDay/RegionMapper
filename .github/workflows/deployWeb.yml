@@ -7,7 +7,6 @@ on:
     tags:
       - "pre-v*"
 
-
 permissions:
   contents: read
   pages: write
@@ -39,24 +38,63 @@ jobs:
 
       - name: Check Godot version
         run: |
+          echo "===== GODOT VERSION ====="
           godot --version
+          echo
+          echo "===== GODOT LOCATION ====="
+          which godot
 
-      - name: Download custom Godot Web template
+      - name: Install custom single-threaded Web template
         run: |
-          VERSION=$(godot --version | head -n1 | awk '{print $1}')
-          mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
+          TEMPLATE_VERSION="4.6.3.stable"
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"
 
-          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_nothreads_release.zip" \
+          mkdir -p "$TEMPLATE_DIR"
+
+          wget -O "$TEMPLATE_DIR/web_nothreads_release.zip" \
             https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_nothreads_release.zip
 
-          echo "Installed template:"
-          ls -lh "$HOME/.local/share/godot/export_templates/$VERSION/"
+          echo "===== CUSTOM TEMPLATE ====="
+          ls -lh "$TEMPLATE_DIR/web_nothreads_release.zip"
+
+          echo
+          echo "===== CUSTOM TEMPLATE CONTENTS ====="
+          unzip -l "$TEMPLATE_DIR/web_nothreads_release.zip"
+
+      - name: Verify templates
+        run: |
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.6.3.stable"
+
+          echo "===== GODOT TEMPLATE DIRECTORY ====="
+          find "$TEMPLATE_DIR" -maxdepth 1 -type f -printf "%f %s bytes\n" | sort
+
+          echo
+          echo "===== WEB TEMPLATES ====="
+          find "$TEMPLATE_DIR" -maxdepth 1 \
+            \( -iname "web_*.zip" -o -iname "web_nothreads*" \) \
+            -printf "%f %s bytes\n" | sort
+
+          echo
+          echo "===== CUSTOM WEB_NOTHREADS_RELEASE.ZIP CONTENTS ====="
+          unzip -l "$TEMPLATE_DIR/web_nothreads_release.zip"
 
       - name: Export Main
         working-directory: main
         run: |
-          mkdir -p $GITHUB_WORKSPACE/build
-          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/index.html
+          mkdir -p "$GITHUB_WORKSPACE/build"
+
+          godot --headless --verbose \
+            --export-release "Web" \
+            "$GITHUB_WORKSPACE/build/index.html"
+        
+      - name: Inspect exported files
+        run: |
+          echo "===== BUILD DIRECTORY ====="
+          find "$GITHUB_WORKSPACE/build" -maxdepth 2 -type f -printf "%p %s bytes\n" | sort
+
+          echo
+          echo "===== INDEX.HTML ====="
+          sed -n '1,160p' "$GITHUB_WORKSPACE/build/index.html"
 
       - name: Checkout tag
         if: startsWith(github.ref, 'refs/tags/pre-v')
@@ -64,13 +102,16 @@ jobs:
         with:
           ref: ${{ github.ref }}
           path: tag
-        
+
       - name: Export tag to /test
         if: startsWith(github.ref, 'refs/tags/pre-v')
         working-directory: tag
         run: |
-          mkdir -p $GITHUB_WORKSPACE/build/test
-          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/test/index.html
+          mkdir -p "$GITHUB_WORKSPACE/build/test"
+
+          godot --headless --verbose \
+            --export-release "Web" \
+            "$GITHUB_WORKSPACE/build/test/index.html"
 
       - name: Cache bust Godot assets
         run: |
@@ -80,16 +121,16 @@ jobs:
             -e "s|\.wasm|.wasm?v=$VERSION|g" \
             -e "s|\.pck|.pck?v=$VERSION|g" \
             -e "s|\.js|.js?v=$VERSION|g" \
-            $GITHUB_WORKSPACE/build/index.html
+            "$GITHUB_WORKSPACE/build/index.html"
 
-          if [ -f $GITHUB_WORKSPACE/build/test/index.html ]; then
+          if [ -f "$GITHUB_WORKSPACE/build/test/index.html" ]; then
             TAG_VERSION="${{ github.ref_name }}"
 
             sed -i \
               -e "s|\.wasm|.wasm?v=$TAG_VERSION|g" \
               -e "s|\.pck|.pck?v=$TAG_VERSION|g" \
               -e "s|\.js|.js?v=$TAG_VERSION|g" \
-              $GITHUB_WORKSPACE/build/test/index.html
+              "$GITHUB_WORKSPACE/build/test/index.html"
           fi
 
       - name: Upload Pages artifact

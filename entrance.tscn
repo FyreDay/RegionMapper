@@ -15,21 +15,27 @@ script = ExtResource("1_4bqal")
 [node name="VBoxContainer" type="VBoxContainer" parent="EditMenu" unique_id=1534079634]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 155.0
-offset_bottom = 246.0
+offset_right = 192.0
+offset_bottom = 281.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="NameEdit" parent="EditMenu/VBoxContainer" unique_id=573753716 instance=ExtResource("2_051eu")]
 layout_mode = 2
 
-[node name="IsTwoWay" type="CheckBox" parent="EditMenu/VBoxContainer" unique_id=761565201]
+[node name="IsTwoWay" type="CheckButton" parent="EditMenu/VBoxContainer" unique_id=6795816]
 layout_mode = 2
+size_flags_horizontal = 0
 text = "Two Way"
 
 [node name="ResetPlate" type="Button" parent="EditMenu/VBoxContainer" unique_id=746074876]
 layout_mode = 2
 text = "Reset Name Plate"
+
+[node name="MinimalNameplate" type="CheckButton" parent="EditMenu/VBoxContainer" unique_id=738603221]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Shrink Nameplate"
 
 [node name="RuleContainer" type="HBoxContainer" parent="EditMenu/VBoxContainer" unique_id=1419514603]
 layout_mode = 2
@@ -67,7 +73,7 @@ text = "Delete"
 [node name="RulePlate" type="LineEdit" parent="." unique_id=298090204]
 offset_right = 68.5
 offset_bottom = 31.0
-theme_override_colors/font_uneditable_color = Color(1, 1, 0.98039216, 0.5019608)
+theme_override_colors/font_uneditable_color = Color(1, 1, 0.98039216, 0.78431374)
 editable = false
 expand_to_text_length = true
 context_menu_enabled = false
@@ -78,5 +84,6 @@ selecting_enabled = false
 [connection signal="text_changed" from="EditMenu/VBoxContainer/NameEdit" to="." method="_on_name_edit_text_changed"]
 [connection signal="toggled" from="EditMenu/VBoxContainer/IsTwoWay" to="." method="_on_is_two_way_toggled"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/ResetPlate" to="." method="_on_reset_plate_pressed"]
+[connection signal="toggled" from="EditMenu/VBoxContainer/MinimalNameplate" to="." method="toggle_minimal_nameplate"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/RuleContainer/DeleteRule" to="." method="_on_delete_rule_pressed"]
 [connection signal="pressed" from="EditMenu/VBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]

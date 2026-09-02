@@ -46,8 +46,8 @@ jobs:
           VERSION=$(godot --version | head -n1 | awk '{print $1}')
           mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
 
-          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
-            https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_release.zip
+          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_nothreads_release.zip" \
+            https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_nothreads_release.zip
 
           echo "Installed template:"
           ls -lh "$HOME/.local/share/godot/export_templates/$VERSION/"

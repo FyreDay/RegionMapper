@@ -154,8 +154,8 @@ initial_position = 1
 [node name="Label" type="Label" parent="ControlHintPanel" unique_id=449243809]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 648.0
-offset_bottom = 521.0
+offset_right = 96.0
+offset_bottom = 96.0
 text = "ctrl+left click: Drag a new Region
 ctrl+right click: Drag new Entrance
 ctrl+alt+right click: Drag new two way Entrance
@@ -204,7 +204,7 @@ offset_left = -45.0
 offset_top = -23.0
 grow_horizontal = 0
 grow_vertical = 0
-text = "v0.1.4-beta4"
+text = "v0.1.4"
 
 [node name="Panel" type="Panel" parent="CanvasLayer" unique_id=2119103673]
 anchors_preset = -1

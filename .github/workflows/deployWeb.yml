@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "pre-v*"
+
 
 permissions:
   contents: read
@@ -22,8 +25,11 @@ jobs:
       image: barichello/godot-ci:4.6.3
 
     steps:
-      - name: Checkout
+      - name: Checkout Main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
 
       - name: Setup Godot
         run: |
@@ -31,16 +37,40 @@ jobs:
           ln -s /root/.local ~/.local
           ln -s /root/.config/godot ~/.config/godot
 
-      - name: Verify templates
+      - name: Check Godot version
         run: |
-          echo "HOME=$HOME"
-          find / -iname "web_nothreads*" 2>/dev/null
-          find / -iname "web_*.zip" 2>/dev/null
+          godot --version
 
-      - name: Export Web
+      - name: Download custom Godot Web template
         run: |
-          mkdir -p build
-          godot --headless --export-release "Web" build/index.html
+          VERSION=$(godot --version | head -n1 | awk '{print $1}')
+          mkdir -p "$HOME/.local/share/godot/export_templates/$VERSION"
+
+          wget -O "$HOME/.local/share/godot/export_templates/$VERSION/web_release.zip" \
+            https://github.com/FyreDay/godot/releases/download/Paste-Fix/web_release.zip
+
+          echo "Installed template:"
+          ls -lh "$HOME/.local/share/godot/export_templates/$VERSION/"
+
+      - name: Export Main
+        working-directory: main
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/build
+          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/index.html
+
+      - name: Checkout tag
+        if: startsWith(github.ref, 'refs/tags/pre-v')
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          path: tag
+        
+      - name: Export tag to /test
+        if: startsWith(github.ref, 'refs/tags/pre-v')
+        working-directory: tag
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/build/test
+          godot --headless --export-release "Web" $GITHUB_WORKSPACE/build/test/index.html
 
       - name: Cache bust Godot assets
         run: |
@@ -50,11 +80,22 @@ jobs:
             -e "s|\.wasm|.wasm?v=$VERSION|g" \
             -e "s|\.pck|.pck?v=$VERSION|g" \
             -e "s|\.js|.js?v=$VERSION|g" \
-            build/index.html
+            $GITHUB_WORKSPACE/build/index.html
+
+          if [ -f $GITHUB_WORKSPACE/build/test/index.html ]; then
+            TAG_VERSION="${{ github.ref_name }}"
+
+            sed -i \
+              -e "s|\.wasm|.wasm?v=$TAG_VERSION|g" \
+              -e "s|\.pck|.pck?v=$TAG_VERSION|g" \
+              -e "s|\.js|.js?v=$TAG_VERSION|g" \
+              $GITHUB_WORKSPACE/build/test/index.html
+          fi
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: ${{ github.workspace }}/build
 
   deploy:
     runs-on: ubuntu-24.04

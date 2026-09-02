@@ -13,11 +13,15 @@ signal endpoint_drag_ended(entrance, endpoint, old_pos, new_pos)
 @onready var rule_name: LineEdit = $EditMenu/VBoxContainer/RuleContainer/LineEdit
 @onready var rule_plate: LineEdit = $RulePlate
 @onready var flag_container: HBoxContainer = $EditMenu/VBoxContainer/FlagContainer
+@onready var is_two_way: CheckButton = $EditMenu/VBoxContainer/IsTwoWay
+@onready var minimal_nameplate_button: CheckButton = $EditMenu/VBoxContainer/MinimalNameplate
+
 
 var flag_toggle = preload("res://flag_box.tscn")
 
 enum endpoints { FROM_ENDPOINT, TO_ENDPOINT, NAME_BOX, NONE}
 const ENDPOINT_RADIUS := 20.0
+const MINIMAL_NAMEPLATE_RADIUS := 16.0
 
 var dragging_endpoint := endpoints.NONE
 var drag_start_pos: Vector2
@@ -28,6 +32,7 @@ var from_pos: Vector2
 var to_pos: Vector2
 var drag_pos: Vector2
 var duel_directonal = false
+var minimal_nameplate = false
 var from_region
 var to_region
 var entrance_name
@@ -45,16 +50,23 @@ var flags:int
 func _ready() -> void:
     z_index = 10
     rule_plate.hide()
+    is_two_way.set_pressed_no_signal(duel_directonal)
+    minimal_nameplate_button.set_pressed_no_signal(minimal_nameplate)
+    queue_redraw()
 
 func _process(_delta: float) -> void:
     pass
 
-func setup(new_from_region, new_to_region, new_from_pos, new_to_pos, new_duel_directonal, new_name, new_flags):
+func setup(new_from_region, new_to_region, new_from_pos, new_to_pos, new_duel_directonal, new_name, new_flags, is_minimal_nameplate = false):
     self.from_region = new_from_region
     self.to_region = new_to_region
     self.from_pos = new_from_pos
     self.to_pos = new_to_pos
-    self.duel_directonal = new_duel_directonal
+    duel_directonal = new_duel_directonal
+    minimal_nameplate = is_minimal_nameplate
+    if is_two_way != null:
+        is_two_way.set_pressed_no_signal(duel_directonal)
+        minimal_nameplate_button.set_pressed_no_signal(minimal_nameplate)
     self.entrance_name = new_name
     self.flags = new_flags
     show_behind_parent = true
@@ -64,8 +76,10 @@ func setup(new_from_region, new_to_region, new_from_pos, new_to_pos, new_duel_di
 
 func is_mouse_over(global_mouse_pos: Vector2) -> bool:
     var mouse_pos := to_local(global_mouse_pos)
-
-    if name_box.has_point(mouse_pos):
+    if minimal_nameplate:
+        if mouse_pos.distance_to(box_center) <= MINIMAL_NAMEPLATE_RADIUS:
+            return true
+    elif name_box.has_point(mouse_pos):
         return true
     return false
     
@@ -131,7 +145,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
       
 func get_endpoint_at_position(mouse_pos: Vector2) -> endpoints:
-    if name_box.has_point(to_local(mouse_pos)):
+    if minimal_nameplate and mouse_pos.distance_to(box_center) <= MINIMAL_NAMEPLATE_RADIUS:
+        return endpoints.NAME_BOX
+    if not minimal_nameplate and name_box.has_point(to_local(mouse_pos)):
         return endpoints.NAME_BOX
     if mouse_pos.distance_to(from_pos) <= ENDPOINT_RADIUS:
         return endpoints.FROM_ENDPOINT
@@ -172,6 +188,7 @@ func update_rule_plate():
     rule_plate.position = Vector2(name_box.position.x + (name_box.size.x/2) - rule_plate.size.x/2, name_box.position.y + name_box.size.y)
     
 func draw_nameplate(to_pos_draw: Vector2, from_pos_draw: Vector2):
+
     var font := ThemeDB.fallback_font
     var font_size := 16
     var padding := 6.0
@@ -184,7 +201,10 @@ func draw_nameplate(to_pos_draw: Vector2, from_pos_draw: Vector2):
 
     var box_size := text_size + Vector2(padding * 2, padding * 2)
     name_box = Rect2(box_center - box_size / 2.0, box_size)
-
+    if minimal_nameplate:
+        draw_circle(box_center, MINIMAL_NAMEPLATE_RADIUS, Color.BLACK)
+        draw_circle(box_center, MINIMAL_NAMEPLATE_RADIUS-2, Color.WHITE)
+        return
     draw_rect(name_box, Color.WHITE)
     draw_rect(name_box, Color.BLACK, false, 2.0)
 
@@ -348,8 +368,13 @@ func _on_delete_rule_pressed() -> void:
 
 func _on_is_two_way_toggled(toggled_on: bool) -> void:
     duel_directonal = toggled_on
+    is_two_way.set_pressed_no_signal(duel_directonal)
     queue_redraw()
 
+func toggle_minimal_nameplate(toggled_on: bool) -> void:
+    minimal_nameplate = toggled_on
+    minimal_nameplate_button.set_pressed_no_signal(toggled_on)
+    queue_redraw()
 
 func _on_reset_plate_pressed() -> void:
     box_center = (to_pos + to_endpoint_offset + from_pos + from_endpoint_offset) / 2.0

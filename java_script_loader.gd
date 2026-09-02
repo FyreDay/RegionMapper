@@ -15,7 +15,7 @@ func _setup_web_paste_bridge() -> void:
 				event.key.toLowerCase() === "v") {
 
 				console.log("Browser Ctrl+V");
-                stopImmediatePropagation()
+                event.stopImmediatePropagation()
 				const input = document.createElement("textarea");
 
 				input.style.position = "fixed";

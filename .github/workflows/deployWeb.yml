@@ -86,6 +86,15 @@ jobs:
           godot --headless --verbose \
             --export-release "Web" \
             "$GITHUB_WORKSPACE/build/index.html"
+        
+      - name: Inspect exported files
+        run: |
+          echo "===== BUILD DIRECTORY ====="
+          find "$GITHUB_WORKSPACE/build" -maxdepth 2 -type f -printf "%p %s bytes\n" | sort
+
+          echo
+          echo "===== INDEX.HTML ====="
+          sed -n '1,160p' "$GITHUB_WORKSPACE/build/index.html"
 
       - name: Checkout tag
         if: startsWith(github.ref, 'refs/tags/pre-v')

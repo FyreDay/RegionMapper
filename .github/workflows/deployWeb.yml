@@ -44,7 +44,7 @@ jobs:
           echo "===== GODOT LOCATION ====="
           which godot
 
-            - name: Install custom single-threaded Web template
+      - name: Install custom single-threaded Web template
         run: |
           TEMPLATE_VERSION="4.6.3.stable"
           TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/$TEMPLATE_VERSION"

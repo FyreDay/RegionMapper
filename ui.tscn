@@ -112,6 +112,30 @@ rule_name = "HasFromListUnique"
 arguments = Array[ExtResource("6_waa4j")]([SubResource("Resource_cxd00"), SubResource("Resource_etlur")])
 metadata/_custom_type_script = "uid://hpud8oi5gfh1"
 
+[sub_resource type="Resource" id="Resource_x2s2p"]
+script = ExtResource("6_waa4j")
+arg_name = "region_name"
+default_value = ""
+metadata/_custom_type_script = "uid://qimhwmqrpvh3"
+
+[sub_resource type="Resource" id="Resource_v8jk5"]
+script = ExtResource("7_ok7cu")
+rule_name = "CanReachRegion"
+arguments = Array[ExtResource("6_waa4j")]([SubResource("Resource_x2s2p")])
+metadata/_custom_type_script = "uid://hpud8oi5gfh1"
+
+[sub_resource type="Resource" id="Resource_cka8k"]
+script = ExtResource("6_waa4j")
+arg_name = "location_name"
+default_value = ""
+metadata/_custom_type_script = "uid://qimhwmqrpvh3"
+
+[sub_resource type="Resource" id="Resource_53buu"]
+script = ExtResource("7_ok7cu")
+rule_name = "CanReachLocation"
+arguments = Array[ExtResource("6_waa4j")]([SubResource("Resource_cka8k")])
+metadata/_custom_type_script = "uid://hpud8oi5gfh1"
+
 [node name="UI" type="Control" unique_id=2092799128]
 layout_mode = 3
 anchors_preset = 15
@@ -154,8 +178,8 @@ initial_position = 1
 [node name="Label" type="Label" parent="ControlHintPanel" unique_id=449243809]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 648.0
-offset_bottom = 521.0
+offset_right = 96.0
+offset_bottom = 96.0
 text = "ctrl+left click: Drag a new Region
 ctrl+right click: Drag new Entrance
 ctrl+alt+right click: Drag new two way Entrance
@@ -204,7 +228,7 @@ offset_left = -45.0
 offset_top = -23.0
 grow_horizontal = 0
 grow_vertical = 0
-text = "v0.1.5"
+text = "v0.1.6"
 
 [node name="Panel" type="Panel" parent="CanvasLayer" unique_id=2119103673]
 anchors_preset = -1
@@ -449,6 +473,16 @@ drag_layer = NodePath("../../../../../DragLayer")
 [node name="HasFromListUnique" parent="CanvasLayer/RuleEditor/RulePartPanel/ScrollContainer/RuleManager" unique_id=2141162639 node_paths=PackedStringArray("drag_layer") instance=ExtResource("5_n5ude")]
 layout_mode = 2
 custom_rule_def = SubResource("Resource_ndy3v")
+drag_layer = NodePath("../../../../../DragLayer")
+
+[node name="CanReachRegion" parent="CanvasLayer/RuleEditor/RulePartPanel/ScrollContainer/RuleManager" unique_id=31425110 node_paths=PackedStringArray("drag_layer") instance=ExtResource("5_n5ude")]
+layout_mode = 2
+custom_rule_def = SubResource("Resource_v8jk5")
+drag_layer = NodePath("../../../../../DragLayer")
+
+[node name="CanReachLocation" parent="CanvasLayer/RuleEditor/RulePartPanel/ScrollContainer/RuleManager" unique_id=2082966785 node_paths=PackedStringArray("drag_layer") instance=ExtResource("5_n5ude")]
+layout_mode = 2
+custom_rule_def = SubResource("Resource_53buu")
 drag_layer = NodePath("../../../../../DragLayer")
 
 [node name="DragLayer" type="Control" parent="CanvasLayer" unique_id=1457058640]
